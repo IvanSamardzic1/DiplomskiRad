@@ -32,7 +32,7 @@ class _AddObrokDialogState extends State<AddObrokDialog> {
     });
   }
 
-  // Dodavanje obroka
+  // Dodavanje obroka u bazu podataka
   Future<void> _addObrok() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();

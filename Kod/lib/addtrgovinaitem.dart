@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'database_helper.dart';
 
+//klasa za dodavanje stvari za trgovinu
 class AddTrgovinaItemDialog extends StatefulWidget {
   final Map<String, dynamic>? item;
   final bool isEditing;

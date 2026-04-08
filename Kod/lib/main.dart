@@ -3,6 +3,9 @@ import 'home.dart';
 import 'namirnice.dart';
 import 'plan_obroka.dart';
 import 'trgovina.dart';
+import 'authscreen.dart';
+import 'profile.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const MyApp()); // Pokretanje aplikacije
@@ -20,8 +23,56 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
 
-      home: const MyHomePage(title: 'Aplikacija za praćenje namirnica'),
+      home: const AuthGate(),
+      routes: {
+        '/home': (context) =>
+        const MyHomePage(title: 'Aplikacija za pracenje namirnica'),
+      },
+
+      //home: const MyHomePage(title: 'Aplikacija za praćenje namirnica'),
       debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class AuthGate extends StatefulWidget {
+  const AuthGate({super.key});
+
+  @override
+  State<AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<AuthGate> {
+  late Future<bool> _isLoggedInFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _isLoggedInFuture = _loadLoginState();
+  }
+
+  Future<bool> _loadLoginState() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('isLoggedIn') ?? false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<bool>(
+      future: _isLoggedInFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (snapshot.data == true) {
+          return const MyHomePage(title: 'Aplikacija za pracenje namirnica');
+        }
+
+        return const AuthScreen();
+      },
     );
   }
 }
@@ -71,6 +122,17 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfilePage()),
+              );
+            },
+          ),
+        ],
       ),
       body: page,
       bottomNavigationBar: BottomNavigationBar(

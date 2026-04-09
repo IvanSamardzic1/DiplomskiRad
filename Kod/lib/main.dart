@@ -108,9 +108,6 @@ class _MyHomePageState extends State<MyHomePage> {
         page = NamirnicePage(); // Stranica s namirnicama
         break;
       case 2:
-        page = PlanObrokaPage(); // Stranica s planom obroka
-        break;
-      case 3:
         page = TrgovinaPage(); // Stranica s trgovinom
         break;
 

@@ -73,14 +73,6 @@ class _AuthScreenState extends State<AuthScreen> {
     return null;
   }
 
-  /*void _submitLogin() {
-    FocusScope.of(context).unfocus();
-    if (_loginFormKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login forma je ispravna')),
-      );
-    }
-  }*/
   Future<void> _submitLogin() async{
     FocusScope.of(context).unfocus();
     if (_loginFormKey.currentState!.validate()) {
@@ -100,15 +92,6 @@ class _AuthScreenState extends State<AuthScreen> {
       Navigator.pushReplacementNamed(context, '/home');
     }
   }
-
-  /*void _submitRegister() {
-    FocusScope.of(context).unfocus();
-    if (_registerFormKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Register forma je ispravna')),
-      );
-    }
-  }*/
 
   @override
   Widget build(BuildContext context) {

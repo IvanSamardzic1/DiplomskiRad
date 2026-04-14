@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'database_helper2.dart' as auth_db;
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -15,7 +16,8 @@ class _AuthScreenState extends State<AuthScreen> {
   final _loginEmailController = TextEditingController();
   final _loginPasswordController = TextEditingController();
 
-  final _registerNameController = TextEditingController();
+  final _registerFirstNameController = TextEditingController();
+  final _registerLastNameController = TextEditingController();
   final _registerEmailController = TextEditingController();
   final _registerPasswordController = TextEditingController();
   final _registerConfirmPasswordController = TextEditingController();
@@ -28,7 +30,8 @@ class _AuthScreenState extends State<AuthScreen> {
   void dispose() {
     _loginEmailController.dispose();
     _loginPasswordController.dispose();
-    _registerNameController.dispose();
+    _registerFirstNameController.dispose();
+    _registerLastNameController.dispose();
     _registerEmailController.dispose();
     _registerPasswordController.dispose();
     _registerConfirmPasswordController.dispose();
@@ -73,25 +76,108 @@ class _AuthScreenState extends State<AuthScreen> {
     return null;
   }
 
-  Future<void> _submitLogin() async{
-    FocusScope.of(context).unfocus();
-    if (_loginFormKey.currentState!.validate()) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('isLoggedIn', true);
-      if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/home');
-    }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
-  Future<void> _submitRegister() async{
-    FocusScope.of(context).unfocus();
-    if (_registerFormKey.currentState!.validate()) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('isLoggedIn', true);
-      if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/home');
-    }
+  Future<void> _showErrorDialog(String message) async {
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.red.shade50,
+          title: const Text(
+            'Greška',
+            style: TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Text(
+            message,
+            style: const TextStyle(color: Colors.red),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text(
+                'OK',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
+
+  Future<void> _submitLogin() async {
+    FocusScope.of(context).unfocus();
+    if (!_loginFormKey.currentState!.validate()) return;
+
+    final mail = _loginEmailController.text.trim();
+    final password = _loginPasswordController.text;
+
+    final exists = await auth_db.DatabaseHelper.emailExists(mail);
+    if (!exists) {
+      //_showMessage('Korisnik s tim emailom ne postoji.');
+      await _showErrorDialog('Korisnik s tim emailom ne postoji.');
+      return;
+    }
+
+    final valid = await auth_db.DatabaseHelper.checkUserCredentials(mail, password);
+    if (!valid) {
+      //_showMessage('Pogrešna lozinka.');
+      await _showErrorDialog('Pogrešna lozinka.');
+      return;
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', true);
+    await prefs.setString('loggedInEmail', mail.toLowerCase());
+
+    if (!mounted) return;
+    print("Prijava uspješna za korisnika: $mail");
+    Navigator.pushReplacementNamed(context, '/home');
+
+  }
+
+  Future<void> _submitRegister() async {
+    FocusScope.of(context).unfocus();
+    if (!_registerFormKey.currentState!.validate()) return;
+
+    final ime = _registerFirstNameController.text.trim();
+    final prezime = _registerLastNameController.text.trim();
+    final mail = _registerEmailController.text.trim();
+    final password = _registerPasswordController.text;
+
+    final exists = await auth_db.DatabaseHelper.emailExists(mail);
+    if (exists) {
+      //_showMessage('Ovaj mail je već registriran.');
+      await _showErrorDialog('Ovaj mail je već registriran.');
+      print("Ovaj mail je već registriran: $mail");
+      return;
+    }
+
+    await auth_db.DatabaseHelper.insertUser(
+      ime: ime,
+      prezime: prezime,
+      mail: mail,
+      plainPassword: password,
+    );
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', true);
+
+    if (!mounted) return;
+    print("Registracija uspješna za korisnika: $mail");
+    Navigator.pushReplacementNamed(context, '/home');
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -168,7 +254,6 @@ class _AuthScreenState extends State<AuthScreen> {
                     },
                   ),
                 ),
-                validator: _passwordValidator,
               ),
               const SizedBox(height: 16),
               SizedBox(
@@ -194,13 +279,23 @@ class _AuthScreenState extends State<AuthScreen> {
           child: Column(
             children: [
               TextFormField(
-                controller: _registerNameController,
+                controller: _registerFirstNameController,
                 decoration: const InputDecoration(
-                  labelText: 'Ime i prezime',
+                  labelText: 'Ime',
                   border: OutlineInputBorder(),
                 ),
-                validator: (value) => _requiredValidator(value, 'Ime i prezime'),
+                validator: (value) => _requiredValidator(value, 'Ime'),
               ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _registerLastNameController,
+                decoration: const InputDecoration(
+                  labelText: 'Prezime',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) => _requiredValidator(value, 'Prezime'),
+              ),
+
               const SizedBox(height: 12),
               TextFormField(
                 controller: _registerEmailController,

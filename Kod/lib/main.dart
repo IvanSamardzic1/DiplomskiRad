@@ -6,8 +6,18 @@ import 'trgovina.dart';
 import 'authscreen.dart';
 import 'profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'sql_connection.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  try {
+    await SqlConnectionService.instance.connect();
+    debugPrint('SQL konekcija uspješno uspostavljena.');
+  } catch (e) {
+    debugPrint('Neuspjelo spajanje na SQL Server: $e');
+  }
+
   runApp(const MyApp()); // Pokretanje aplikacije
 }
 
@@ -107,7 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
       case 1:
         page = NamirnicePage(); // Stranica s namirnicama
         break;
-      case 2:
+      case 3:
         page = TrgovinaPage(); // Stranica s trgovinom
         break;
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:projekt_prvaverzija/dbqueries.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'database_helper2.dart' as auth_db;
+
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -122,14 +123,14 @@ class _AuthScreenState extends State<AuthScreen> {
     final mail = _loginEmailController.text.trim();
     final password = _loginPasswordController.text;
 
-    final exists = await auth_db.DatabaseHelper.emailExists(mail);
+    final exists = await DbQueries.emailExists(mail);
     if (!exists) {
       //_showMessage('Korisnik s tim emailom ne postoji.');
       await _showErrorDialog('Korisnik s tim emailom ne postoji.');
       return;
     }
 
-    final valid = await auth_db.DatabaseHelper.checkUserCredentials(mail, password);
+    final valid = await DbQueries.checkUserCredentials(mail, password);
     if (!valid) {
       //_showMessage('Pogrešna lozinka.');
       await _showErrorDialog('Pogrešna lozinka.');
@@ -155,7 +156,7 @@ class _AuthScreenState extends State<AuthScreen> {
     final mail = _registerEmailController.text.trim();
     final password = _registerPasswordController.text;
 
-    final exists = await auth_db.DatabaseHelper.emailExists(mail);
+    final exists = await DbQueries.emailExists(mail);
     if (exists) {
       //_showMessage('Ovaj mail je već registriran.');
       await _showErrorDialog('Ovaj mail je već registriran.');
@@ -163,7 +164,7 @@ class _AuthScreenState extends State<AuthScreen> {
       return;
     }
 
-    await auth_db.DatabaseHelper.insertUser(
+    await DbQueries.insertUser(
       ime: ime,
       prezime: prezime,
       mail: mail,
@@ -172,6 +173,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isLoggedIn', true);
+    await prefs.setString('loggedInEmail', mail.toLowerCase());
 
     if (!mounted) return;
     print("Registracija uspješna za korisnika: $mail");

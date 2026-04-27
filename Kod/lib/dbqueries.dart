@@ -96,5 +96,45 @@ class DbQueries {
   ''');
   }
 
+  static Future<int?> getUserIdByMail(String mail) async {
+    final safeMail = _sqlEscape(mail.trim().toLowerCase());
+
+    final rows = await _sql.query('''
+    SELECT TOP 1 idKorisnik
+    FROM Korisnik
+    WHERE LOWER(email) = '$safeMail'
+  ''');
+
+    if (rows.isEmpty) return null;
+    final raw = rows.first['idKorisnik'];
+    print("Id korisnika za mail '$mail' je: $raw");
+    return int.tryParse(raw?.toString() ?? '');
+  }
+
+  static Future<List<Map<String, dynamic>>> getZaliheForUser(int idKorisnik) async {
+    final rows = await _sql.query('''
+    SELECT
+      z.idZaliha,
+      z.idKorisnik,
+      z.idSastojak,
+      z.kolicina,
+      z.datum,
+      z.[min] AS minKolicina,
+      s.ime AS sastojakIme,
+      s.idKategorija,
+      s.idVelicina,
+      v.oznakaVelicine,
+      k.imeKategorije AS kategorijaIme
+    FROM Zaliha z
+    INNER JOIN Sastojak s ON s.idSastojak = z.idSastojak
+    LEFT JOIN Velicina v ON v.idVelicina = s.idVelicina
+    LEFT JOIN Kategorija k ON k.idKategorija = s.idKategorija
+    WHERE z.idKorisnik = $idKorisnik
+    ORDER BY z.datum ASC, s.ime ASC
+  ''');
+
+    return rows.map((row) => Map<String, dynamic>.from(row)).toList();
+  }
+
 
 }

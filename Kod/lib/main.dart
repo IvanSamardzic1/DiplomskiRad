@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:projekt_prvaverzija/zaliheKorisnika.dart';
 import 'home.dart';
 import 'namirnice.dart';
 import 'plan_obroka.dart';
@@ -7,6 +8,7 @@ import 'authscreen.dart';
 import 'profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'sql_connection.dart';
+import 'zaliheKorisnika.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -117,6 +119,9 @@ class _MyHomePageState extends State<MyHomePage> {
       case 1:
         page = NamirnicePage(); // Stranica s namirnicama
         break;
+      case 2:
+        page = const ZalihaNamirnicePage();
+        break;
       case 3:
         page = TrgovinaPage(); // Stranica s trgovinom
         break;
@@ -152,6 +157,10 @@ class _MyHomePageState extends State<MyHomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.fastfood),
             label: 'Moje namirnice',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.inventory_2),
+            label: 'Zaliha',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_today),

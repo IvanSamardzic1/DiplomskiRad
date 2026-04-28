@@ -75,6 +75,82 @@ class _ZalihaNamirnicePageState extends State<ZalihaNamirnicePage> {
     }
   }
 
+  Future<void> _openEditDialog(Map<String, dynamic> item) async {
+    if (_userId == null) return;
+
+    final updated = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => _EditZalihaDialog(
+        idKorisnik: _userId!,
+        item: item,
+      ),
+    );
+
+    if (updated == true) {
+      await _loadZalihe();
+    }
+  }
+
+  Future<void> _confirmDelete(Map<String, dynamic> item) async {
+    if (_userId == null) return;
+
+    final idZaliha = _toInt(item['idZaliha']);
+    if (idZaliha <= 0) return;
+
+    final sastojakIme = (item['sastojakIme'] ?? 'Ova namirnica').toString();
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Potvrda brisanja'),
+        content:
+        Text('Jesi siguran da želiš obrisati "$sastojakIme" iz zalihe?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Odustani'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Obriši'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    try {
+      await DbQueries.deleteZalihaById(
+        idZaliha: idZaliha,
+        idKorisnik: _userId!,
+      );
+      if (!mounted) return;
+      await _loadZalihe();
+    } catch (e) {
+      if (!mounted) return;
+      _showErrorDialog(e.toString());
+    }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog<void>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Greška'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   int _toInt(dynamic value) => int.tryParse(value?.toString() ?? '') ?? 0;
 
   String _formatDate(dynamic rawValue) {
@@ -111,7 +187,7 @@ class _ZalihaNamirnicePageState extends State<ZalihaNamirnicePage> {
               const SizedBox(height: 12),
               ElevatedButton(
                 onPressed: _loadZalihe,
-                child: const Text('Pokusaj ponovno'),
+                child: const Text('Pokušaj ponovno'),
               ),
             ],
           ),
@@ -130,65 +206,105 @@ class _ZalihaNamirnicePageState extends State<ZalihaNamirnicePage> {
             height: double.infinity,
           ),
         ),
-        _zalihe.isEmpty
-            ? const Center(
-          child: Text(
-            'Nema zaliha za ovog korisnika.',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.red,
+
+        Positioned(
+          top: 12,
+          left: 16,
+          right: 16,
+          child: SafeArea(
+            bottom: false,
+            child: Text(
+              'Moje zalihe namirnica',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.blueGrey.shade900,
+              ),
             ),
           ),
-        )
-            : RefreshIndicator(
-          onRefresh: _loadZalihe,
-          child: ListView.builder(
-            padding: const EdgeInsets.fromLTRB(12, 8, 12, 100),
-            itemCount: _zalihe.length,
-            itemBuilder: (context, index) {
-              final item = _zalihe[index];
-              final kolicina = _toInt(item['kolicina']);
-              final minKolicina = _toInt(item['minKolicina']);
-              final isBelowMin = kolicina < minKolicina;
+        ),
 
-              final sastojakIme = (item['sastojakIme'] ?? '').toString();
-              final kategorijaIme =
-              (item['kategorijaIme'] ?? '-').toString();
-              final oznakaVelicine =
-              (item['oznakaVelicine'] ?? '').toString();
-              final datumRoka = _formatDate(item['datum']);
+        Padding(
+          padding: const EdgeInsets.only(top: 56),
+          child: _zalihe.isEmpty
+              ? const Center(
+            child: Text(
+              'Nema zaliha za ovog korisnika.',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.red,
+              ),
+            ),
+          )
+              : RefreshIndicator(
+            onRefresh: _loadZalihe,
+            child: ListView.builder(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 100),
+              itemCount: _zalihe.length,
+              itemBuilder: (context, index) {
+                final item = _zalihe[index];
+                final kolicina = _toInt(item['kolicina']);
+                final minKolicina = _toInt(item['minKolicina']);
+                final isBelowMin = kolicina < minKolicina;
 
-              return Card(
-                child: ListTile(
-                  leading: Icon(
-                    isBelowMin
-                        ? Icons.warning_amber_rounded
-                        : Icons.inventory_2,
-                    color: isBelowMin ? Colors.orange : Colors.blue,
-                  ),
-                  title: Text(sastojakIme),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Kategorija: $kategorijaIme'),
-                      Text('Količina: $kolicina $oznakaVelicine'),
-                      Text('Rok trajanja: $datumRoka'),
-                      if (isBelowMin)
-                        Text(
-                          'Upozorenje: ispod minimalne količine ($minKolicina)',
-                          style: const TextStyle(
-                            color: Colors.red,
-                            fontWeight: FontWeight.w600,
+                final sastojakIme = (item['sastojakIme'] ?? '').toString();
+                final kategorijaIme =
+                (item['kategorijaIme'] ?? '-').toString();
+                final oznakaVelicine =
+                (item['oznakaVelicine'] ?? '').toString();
+                final datumRoka = _formatDate(item['datum']);
+
+                return Card(
+                  child: ListTile(
+                    leading: Icon(
+                      isBelowMin
+                          ? Icons.warning_amber_rounded
+                          : Icons.inventory_2,
+                      color: isBelowMin ? Colors.orange : Colors.blue,
+                    ),
+                    title: Text(sastojakIme),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Kategorija: $kategorijaIme'),
+                        Text('Količina: $kolicina $oznakaVelicine'),
+                        Text('Rok trajanja: $datumRoka'),
+                        if (isBelowMin)
+                          Text(
+                            'Upozorenje: ispod minimalne količine ($minKolicina)',
+                            style: const TextStyle(
+                              color: Colors.red,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
-                    ],
+                      ],
+                    ),
+                    trailing: SizedBox(
+                      width: 96,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            tooltip: 'Uredi',
+                            icon: const Icon(Icons.edit, color: Colors.blue),
+                            onPressed: () => _openEditDialog(item),
+                          ),
+                          IconButton(
+                            tooltip: 'Obriši',
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () => _confirmDelete(item),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
+
         Positioned(
           right: 16,
           bottom: 16,
@@ -202,6 +318,7 @@ class _ZalihaNamirnicePageState extends State<ZalihaNamirnicePage> {
       ],
     );
   }
+
 }
 
 class _AddZalihaDialog extends StatefulWidget {
@@ -487,20 +604,20 @@ class _AddZalihaDialogState extends State<_AddZalihaDialog> {
                   },
                   validator: (v) => v == null ? 'Odaberi kategoriju' : null,
                 ),
-
                 if (_selectedKategorijaId != null) ...[
                   const SizedBox(height: 12),
-
                   if (_sastojci.isNotEmpty)
                     DropdownButtonFormField<int>(
                       value: _selectedSastojakId,
                       hint: const Text('Odaberi sastojak'),
-                      decoration: const InputDecoration(labelText: 'Sastojak'),
+                      decoration:
+                      const InputDecoration(labelText: 'Sastojak'),
                       items: _sastojci
                           .map(
                             (s) => DropdownMenuItem<int>(
                           value: int.tryParse(s['idSastojak'].toString()),
-                          child: Text((s['sastojakIme'] ?? '').toString()),
+                          child:
+                          Text((s['sastojakIme'] ?? '').toString()),
                         ),
                       )
                           .toList(),
@@ -515,7 +632,6 @@ class _AddZalihaDialogState extends State<_AddZalihaDialog> {
                         style: TextStyle(color: Colors.red),
                       ),
                     ),
-
                   const SizedBox(height: 8),
                   Align(
                     alignment: Alignment.centerLeft,
@@ -524,7 +640,6 @@ class _AddZalihaDialogState extends State<_AddZalihaDialog> {
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                   ),
-
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _kolicinaController,
@@ -556,16 +671,19 @@ class _AddZalihaDialogState extends State<_AddZalihaDialog> {
                         padding: const EdgeInsets.only(top: 6),
                         child: Text(
                           'Dosadašnja količina: ${_toInt(_postojecaZaliha!['kolicina'])}',
-                          style: const TextStyle(color: Colors.grey, fontSize: 12),
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                          ),
                         ),
                       ),
                     ),
-
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _minController,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: 'Minimalna količina'),
+                    decoration:
+                    const InputDecoration(labelText: 'Minimalna količina'),
                     validator: (v) {
                       final txt = (v ?? '').trim();
 
@@ -587,11 +705,13 @@ class _AddZalihaDialogState extends State<_AddZalihaDialog> {
                         padding: const EdgeInsets.only(top: 6),
                         child: Text(
                           'Dosadašnja minimalna količina: ${_toInt(_postojecaZaliha!['minKolicina'])}',
-                          style: const TextStyle(color: Colors.grey, fontSize: 12),
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                          ),
                         ),
                       ),
                     ),
-
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _datumController,
@@ -617,11 +737,13 @@ class _AddZalihaDialogState extends State<_AddZalihaDialog> {
                         padding: const EdgeInsets.only(top: 6),
                         child: Text(
                           'Dosadašnji rok trajanja: ${_formatDate(_postojecaZaliha!['datum'])}',
-                          style: const TextStyle(color: Colors.grey, fontSize: 12),
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                          ),
                         ),
                       ),
                     ),
-
                   if (_postojecaZaliha != null)
                     const Align(
                       alignment: Alignment.centerLeft,
@@ -634,7 +756,6 @@ class _AddZalihaDialogState extends State<_AddZalihaDialog> {
                       ),
                     ),
                 ],
-
                 if (_errorText != null) ...[
                   const SizedBox(height: 12),
                   Text(
@@ -642,7 +763,199 @@ class _AddZalihaDialogState extends State<_AddZalihaDialog> {
                     style: const TextStyle(color: Colors.red),
                   ),
                 ],
+              ],
+            ),
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _submitting ? null : () => Navigator.of(context).pop(false),
+          child: const Text('Odustani'),
+        ),
+        ElevatedButton(
+          onPressed: _submitting ? null : _submit,
+          child: _submitting
+              ? const SizedBox(
+            width: 18,
+            height: 18,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          )
+              : const Text('Spremi'),
+        ),
+      ],
+    );
+  }
+}
 
+class _EditZalihaDialog extends StatefulWidget {
+  final int idKorisnik;
+  final Map<String, dynamic> item;
+
+  const _EditZalihaDialog({
+    required this.idKorisnik,
+    required this.item,
+  });
+
+  @override
+  State<_EditZalihaDialog> createState() => _EditZalihaDialogState();
+}
+
+class _EditZalihaDialogState extends State<_EditZalihaDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _kolicinaController = TextEditingController();
+  final _minController = TextEditingController();
+  final _datumController = TextEditingController();
+
+  bool _submitting = false;
+  DateTime? _selectedDatum;
+
+  int _toInt(dynamic value) => int.tryParse(value?.toString() ?? '') ?? 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _kolicinaController.text = _toInt(widget.item['kolicina']).toString();
+    _minController.text = _toInt(widget.item['minKolicina']).toString();
+
+    final rawDate = widget.item['datum']?.toString();
+    final parsed = rawDate == null ? null : DateTime.tryParse(rawDate);
+    _selectedDatum = parsed;
+
+    if (parsed != null) {
+      final dd = parsed.day.toString().padLeft(2, '0');
+      final mm = parsed.month.toString().padLeft(2, '0');
+      final yyyy = parsed.year.toString();
+      _datumController.text = '$dd.$mm.$yyyy';
+    }
+  }
+
+  @override
+  void dispose() {
+    _kolicinaController.dispose();
+    _minController.dispose();
+    _datumController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickDate() async {
+    final now = DateTime.now();
+    final initial = _selectedDatum ?? now;
+
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(now.year - 2),
+      lastDate: DateTime(now.year + 20),
+    );
+
+    if (picked == null) return;
+
+    final dd = picked.day.toString().padLeft(2, '0');
+    final mm = picked.month.toString().padLeft(2, '0');
+    final yyyy = picked.year.toString();
+
+    setState(() {
+      _selectedDatum = picked;
+      _datumController.text = '$dd.$mm.$yyyy';
+    });
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+    if (_selectedDatum == null) return;
+
+    final idZaliha = _toInt(widget.item['idZaliha']);
+    if (idZaliha <= 0) return;
+
+    final kolicina = int.parse(_kolicinaController.text.trim());
+    final minKolicina = int.parse(_minController.text.trim());
+
+    setState(() => _submitting = true);
+
+    try {
+      await DbQueries.updateZalihaById(
+        idZaliha: idZaliha,
+        idKorisnik: widget.idKorisnik,
+        kolicina: kolicina,
+        minKolicina: minKolicina,
+        datumRoka: _selectedDatum!,
+      );
+
+      if (!mounted) return;
+      Navigator.of(context).pop(true);
+    } catch (e) {
+      if (!mounted) return;
+      showDialog<void>(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text('Greška'),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _submitting = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final sastojakIme = (widget.item['sastojakIme'] ?? '').toString();
+
+    return AlertDialog(
+      title: Text('Uredi zalihu: $sastojakIme'),
+      content: SizedBox(
+        width: 360,
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: _kolicinaController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'Količina'),
+                  validator: (v) {
+                    final n = int.tryParse((v ?? '').trim());
+                    if (n == null) return 'Unesi broj';
+                    if (n <= 0) return 'Mora biti više od 0';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _minController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'Minimalna količina'),
+                  validator: (v) {
+                    final n = int.tryParse((v ?? '').trim());
+                    if (n == null) return 'Unesi broj';
+                    if (n < 0) return 'Ne može biti negativno';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _datumController,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Datum roka trajanja',
+                    suffixIcon: Icon(Icons.calendar_today),
+                  ),
+                  onTap: _pickDate,
+                  validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Odaberi datum' : null,
+                ),
               ],
             ),
           ),

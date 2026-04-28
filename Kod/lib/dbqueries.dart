@@ -226,6 +226,47 @@ class DbQueries {
     return Map<String, dynamic>.from(rows.first);
   }
 
+  static Future<void> updateZalihaById({
+    required int idZaliha,
+    required int idKorisnik,
+    required int kolicina,
+    required int minKolicina,
+    required DateTime datumRoka,
+  }) async {
+    if (kolicina <= 0) {
+      throw Exception('Količina mora biti veća od 0.');
+    }
+    if (minKolicina < 0) {
+      throw Exception('Minimalna količina ne može biti negativna.');
+    }
+
+    final y = datumRoka.year.toString().padLeft(4, '0');
+    final m = datumRoka.month.toString().padLeft(2, '0');
+    final d = datumRoka.day.toString().padLeft(2, '0');
+    final safeDatum = '$y-$m-$d';
+
+    await _sql.execute('''
+    UPDATE Zaliha
+    SET
+      kolicina = $kolicina,
+      datum = '$safeDatum',
+      [min] = $minKolicina
+    WHERE idZaliha = $idZaliha
+      AND idKorisnik = $idKorisnik
+  ''');
+  }
+
+  static Future<void> deleteZalihaById({
+    required int idZaliha,
+    required int idKorisnik,
+  }) async {
+    await _sql.execute('''
+    DELETE FROM Zaliha
+    WHERE idZaliha = $idZaliha
+      AND idKorisnik = $idKorisnik
+  ''');
+  }
+
 
 
 }

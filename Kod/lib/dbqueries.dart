@@ -136,5 +136,96 @@ class DbQueries {
     return rows.map((row) => Map<String, dynamic>.from(row)).toList();
   }
 
+  static Future<List<Map<String, dynamic>>> getKategorije() async {
+    final rows = await _sql.query('''
+    SELECT idKategorija, imeKategorije
+    FROM Kategorija
+    ORDER BY imeKategorije ASC
+  ''');
+
+    return rows.map((r) => Map<String, dynamic>.from(r)).toList();
+  }
+
+  static Future<List<Map<String, dynamic>>> getSastojciByKategorija(int idKategorija) async {
+    final rows = await _sql.query('''
+    SELECT
+      s.idSastojak,
+      s.ime AS sastojakIme,
+      s.idVelicina,
+      v.oznakaVelicine
+    FROM Sastojak s
+    LEFT JOIN Velicina v ON v.idVelicina = s.idVelicina
+    WHERE s.idKategorija = $idKategorija
+    ORDER BY s.ime ASC
+  ''');
+
+    return rows.map((r) => Map<String, dynamic>.from(r)).toList();
+  }
+
+  static Future<void> upsertZalihaForUser({
+    required int idKorisnik,
+    required int idSastojak,
+    required int dodatnaKolicina,
+    required DateTime datumRoka,
+    required int minKolicina,
+  }) async {
+    if (dodatnaKolicina <= 0) {
+      throw Exception('Količina mora biti veća od 0.');
+    }
+    if (minKolicina < 0) {
+      throw Exception('Minimalna količina ne može biti negativna.');
+    }
+
+    final y = datumRoka.year.toString().padLeft(4, '0');
+    final m = datumRoka.month.toString().padLeft(2, '0');
+    final d = datumRoka.day.toString().padLeft(2, '0');
+    final safeDatum = '$y-$m-$d';
+
+    await _sql.execute('''
+    IF EXISTS (
+      SELECT 1
+      FROM Zaliha
+      WHERE idKorisnik = $idKorisnik
+        AND idSastojak = $idSastojak
+    )
+    BEGIN
+      UPDATE Zaliha
+      SET
+        kolicina = ISNULL(kolicina, 0) + $dodatnaKolicina,
+        datum = '$safeDatum',
+        [min] = $minKolicina
+      WHERE idKorisnik = $idKorisnik
+        AND idSastojak = $idSastojak;
+    END
+    ELSE
+    BEGIN
+      INSERT INTO Zaliha (idKorisnik, idSastojak, kolicina, datum, [min])
+      VALUES ($idKorisnik, $idSastojak, $dodatnaKolicina, '$safeDatum', $minKolicina);
+    END
+  ''');
+  }
+
+  static Future<Map<String, dynamic>?> getZalihaItemForUserSastojak({
+    required int idKorisnik,
+    required int idSastojak,
+  }) async {
+    final rows = await _sql.query('''
+    SELECT TOP 1
+      idZaliha,
+      idKorisnik,
+      idSastojak,
+      kolicina,
+      datum,
+      [min] AS minKolicina
+    FROM Zaliha
+    WHERE idKorisnik = $idKorisnik
+      AND idSastojak = $idSastojak
+  ''');
+
+    if (rows.isEmpty) return null;
+    return Map<String, dynamic>.from(rows.first);
+  }
+
+
 
 }

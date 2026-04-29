@@ -267,6 +267,136 @@ class DbQueries {
   ''');
   }
 
+  static Future<List<Map<String, dynamic>>> getStavkePopisaTrgovineForUser(
+      int idKorisnik,
+      ) async {
+    final rows = await _sql.query('''
+    SELECT
+      st.idStavkaPopisa,
+      st.idKorisnik,
+      st.sastojakId,
+      st.kolicina,
+      s.ime AS sastojakIme,
+      s.idKategorija,
+      s.idVelicina,
+      k.imeKategorije AS kategorijaIme,
+      v.oznakaVelicine
+    FROM StavkaPopisaTrgovina st
+    INNER JOIN Sastojak s ON s.idSastojak = st.sastojakId
+    LEFT JOIN Kategorija k ON k.idKategorija = s.idKategorija
+    LEFT JOIN Velicina v ON v.idVelicina = s.idVelicina
+    WHERE st.idKorisnik = $idKorisnik
+    ORDER BY s.ime ASC
+  ''');
+
+    return rows.map((r) => Map<String, dynamic>.from(r)).toList();
+  }
+
+  static Future<void> insertStavkaPopisaTrgovine({
+    required int idKorisnik,
+    required int idSastojak,
+    required int kolicina,
+  }) async {
+    if (kolicina <= 0) {
+      throw Exception('Količina mora biti veća od 0.');
+    }
+
+    await _sql.execute('''
+    INSERT INTO StavkaPopisaTrgovina (idKorisnik, sastojakId, kolicina)
+    VALUES ($idKorisnik, $idSastojak, $kolicina)
+  ''');
+  }
+
+  static Future<void> deleteStavkaPopisaTrgovineById({
+    required int idStavkaPopisa,
+    required int idKorisnik,
+  }) async {
+    print("Brisanje StavkaPopisaTrgovina: idStavkaPopisa=$idStavkaPopisa, idKorisnik=$idKorisnik");
+    await _sql.execute('''
+    DELETE FROM StavkaPopisaTrgovina
+    WHERE idStavkaPopisa = $idStavkaPopisa
+      AND idKorisnik = $idKorisnik
+  ''');
+  }
+
+
+  static Future<void> updateStavkaPopisaTrgovineKolicina({
+    required int idStavkaPopisa,
+    required int idKorisnik,
+    required int novaKolicina,
+  }) async {
+    if (novaKolicina <= 0) {
+      throw Exception('Količina mora biti veća od 0.');
+    }
+    print("Update kolicine za StavkaPopisaTrgovina: idStavkaPopisa=$idStavkaPopisa, idKorisnik=$idKorisnik, novaKolicina=$novaKolicina");
+    await _sql.execute('''
+    UPDATE StavkaPopisaTrgovina
+    SET kolicina = $novaKolicina
+    WHERE idStavkaPopisa = $idStavkaPopisa
+      AND idKorisnik = $idKorisnik
+  ''');
+  }
+
+  static Future<void> purchaseStavkaPopisaTrgovine({
+    required int idKorisnik,
+    required int idStavkaPopisa,
+    required int idSastojak,
+    required int kupljenaKolicina,
+    required DateTime datumRoka,
+  }) async {
+    if (kupljenaKolicina <= 0) {
+      throw Exception('Količina mora biti veća od 0.');
+    }
+
+    final y = datumRoka.year.toString().padLeft(4, '0');
+    final m = datumRoka.month.toString().padLeft(2, '0');
+    final d = datumRoka.day.toString().padLeft(2, '0');
+    final safeDatum = '$y-$m-$d';
+
+    print("Prebacivanje iz StavkaPopisaTrgovina u Zaliha: idKorisnik=$idKorisnik, idSastojak=$idSastojak, kupljenaKolicina=$kupljenaKolicina, datumRoka=$safeDatum");
+    await _sql.execute('''
+    BEGIN TRY
+      BEGIN TRANSACTION;
+
+      IF EXISTS (
+        SELECT 1
+        FROM Zaliha
+        WHERE idKorisnik = $idKorisnik
+          AND idSastojak = $idSastojak
+      )
+      BEGIN
+        UPDATE Zaliha
+        SET
+          kolicina = ISNULL(kolicina, 0) + $kupljenaKolicina,
+          datum = CASE
+                    WHEN datum IS NULL THEN '$safeDatum'
+                    WHEN '$safeDatum' < datum THEN '$safeDatum'
+                    ELSE datum
+                  END
+        WHERE idKorisnik = $idKorisnik
+          AND idSastojak = $idSastojak;
+      END
+      ELSE
+      BEGIN
+        INSERT INTO Zaliha (idKorisnik, idSastojak, kolicina, datum, [min])
+        VALUES ($idKorisnik, $idSastojak, $kupljenaKolicina, '$safeDatum', 0);
+      END
+
+      DELETE FROM StavkaPopisaTrgovina
+      WHERE idStavkaPopisa = $idStavkaPopisa
+        AND idKorisnik = $idKorisnik;
+
+      COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+      IF @@TRANCOUNT > 0
+        ROLLBACK TRANSACTION;
+      THROW;
+    END CATCH
+  ''');
+  }
+
+
 
 
 }

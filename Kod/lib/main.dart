@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:projekt_prvaverzija/zaliheKorisnika.dart';
 import 'home.dart';
-import 'namirnice.dart';
-import 'plan_obroka.dart';
 import 'trgovina.dart';
 import 'authscreen.dart';
 import 'profile.dart';
@@ -117,12 +115,9 @@ class _MyHomePageState extends State<MyHomePage> {
         page = HomePage(); // Početna stranica
         break;
       case 1:
-        page = NamirnicePage(); // Stranica s namirnicama
-        break;
-      case 2:
         page = const ZalihaNamirnicePage();
         break;
-      case 3:
+      case 2:
         page = TrgovinaPage(); // Stranica s trgovinom
         break;
 
@@ -155,16 +150,8 @@ class _MyHomePageState extends State<MyHomePage> {
             label: 'Početna',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.fastfood),
-            label: 'Moje namirnice',
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.inventory_2),
-            label: 'Zaliha',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today),
-            label: 'Plan obroka',
+            label: 'Moje namirnice',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.store),

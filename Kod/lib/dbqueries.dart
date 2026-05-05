@@ -400,12 +400,196 @@ class DbQueries {
     final rows = await _sql.query('''
     SELECT
       r.idRecept,
-      r.naziv
+      r.naziv,
+      r.autorKorisnikId,
+      COALESCE(
+        NULLIF(LTRIM(RTRIM(CONCAT(ISNULL(k.ime, ''), ' ', ISNULL(k.prezime, '')))), ''),
+        k.email,
+        'Nepoznato'
+      ) AS autorIme
     FROM Recept r
+    LEFT JOIN Korisnik k ON k.idKorisnik = r.autorKorisnikId
     ORDER BY r.naziv ASC
   ''');
 
     return rows.map((r) => Map<String, dynamic>.from(r)).toList();
+  }
+
+  static Future<int> insertReceptForAuthor({
+    required int autorKorisnikId,
+    required String naziv,
+    required String opis,
+    required int vrijemePripremeMin,
+    required List<Map<String, dynamic>> sastojci,
+  }) async {
+    final safeNaziv = _sqlEscape(naziv.trim());
+    final safeOpis = _sqlEscape(opis.trim());
+
+    if (safeNaziv.isEmpty) {
+      throw Exception('Naziv recepta je obavezan.');
+    }
+    if (vrijemePripremeMin <= 0) {
+      throw Exception('Vrijeme pripreme mora biti veće od 0.');
+    }
+    if (sastojci.isEmpty) {
+      throw Exception('Dodaj barem jedan sastojak.');
+    }
+
+    final insertSastojciSql = StringBuffer();
+    for (final s in sastojci) {
+      final idSastojak = int.tryParse(s['idSastojak']?.toString() ?? '');
+      final potrebnaKolicina = int.tryParse(s['potrebnaKolicina']?.toString() ?? '');
+
+      if (idSastojak == null || idSastojak <= 0) {
+        throw Exception('Neispravan sastojak.');
+      }
+      if (potrebnaKolicina == null || potrebnaKolicina <= 0) {
+        throw Exception('Količina sastojka mora biti > 0.');
+      }
+
+      insertSastojciSql.writeln('''
+      INSERT INTO ReceptSastojak (idRecept, idSastojak, potrebnaKolicina)
+      VALUES (@newId, $idSastojak, $potrebnaKolicina);
+    ''');
+    }
+
+    final rows = await _sql.query('''
+    BEGIN TRY
+      BEGIN TRANSACTION;
+
+      INSERT INTO Recept (naziv, opis, vrijemePripreme, autorKorisnikId)
+      VALUES ('$safeNaziv', '$safeOpis', $vrijemePripremeMin, $autorKorisnikId);
+
+      DECLARE @newId INT = CAST(SCOPE_IDENTITY() AS INT);
+
+      ${insertSastojciSql.toString()}
+
+      COMMIT TRANSACTION;
+      SELECT @newId AS idRecept;
+    END TRY
+    BEGIN CATCH
+      IF @@TRANCOUNT > 0
+        ROLLBACK TRANSACTION;
+      THROW;
+    END CATCH
+  ''');
+
+    if (rows.isEmpty) {
+      throw Exception('Neuspješno dodavanje recepta.');
+    }
+
+    final id = int.tryParse(rows.first['idRecept']?.toString() ?? '');
+    if (id == null || id <= 0) {
+      throw Exception('Neuspješno dohvaćanje ID-a novog recepta.');
+    }
+
+    return id;
+  }
+
+
+  static Future<void> updateReceptByAuthor({
+    required int idRecept,
+    required int autorKorisnikId,
+    required String naziv,
+    required String opis,
+    required int vrijemePripremeMin,
+    required List<Map<String, dynamic>> sastojci,
+  }) async {
+    final safeNaziv = _sqlEscape(naziv.trim());
+    final safeOpis = _sqlEscape(opis.trim());
+
+    if (safeNaziv.isEmpty) {
+      throw Exception('Naziv recepta je obavezan.');
+    }
+    if (vrijemePripremeMin <= 0) {
+      throw Exception('Vrijeme pripreme mora biti veće od 0.');
+    }
+    if (sastojci.isEmpty) {
+      throw Exception('Dodaj barem jedan sastojak.');
+    }
+
+    final insertSastojciSql = StringBuffer();
+    for (final s in sastojci) {
+      final idSastojak = int.tryParse(s['idSastojak']?.toString() ?? '');
+      final potrebnaKolicina = int.tryParse(s['potrebnaKolicina']?.toString() ?? '');
+
+      if (idSastojak == null || idSastojak <= 0) {
+        throw Exception('Neispravan sastojak.');
+      }
+      if (potrebnaKolicina == null || potrebnaKolicina <= 0) {
+        throw Exception('Količina sastojka mora biti > 0.');
+      }
+
+      insertSastojciSql.writeln('''
+      INSERT INTO ReceptSastojak (idRecept, idSastojak, potrebnaKolicina)
+      VALUES ($idRecept, $idSastojak, $potrebnaKolicina);
+    ''');
+    }
+
+    await _sql.execute('''
+    BEGIN TRY
+      BEGIN TRANSACTION;
+
+      UPDATE Recept
+      SET
+        naziv = '$safeNaziv',
+        opis = '$safeOpis',
+        vrijemePripreme = $vrijemePripremeMin
+      WHERE idRecept = $idRecept
+        AND autorKorisnikId = $autorKorisnikId;
+
+      IF @@ROWCOUNT = 0
+        THROW 51000, 'Nemaš ovlasti za uređivanje ovog recepta ili recept ne postoji.', 1;
+
+      DELETE FROM ReceptSastojak
+      WHERE idRecept = $idRecept;
+
+      ${insertSastojciSql.toString()}
+
+      COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+      IF @@TRANCOUNT > 0
+        ROLLBACK TRANSACTION;
+      THROW;
+    END CATCH
+  ''');
+  }
+
+
+  static Future<void> deleteReceptByAuthor({
+    required int idRecept,
+    required int autorKorisnikId,
+  }) async {
+    await _sql.execute('''
+    BEGIN TRY
+      BEGIN TRANSACTION;
+
+      IF NOT EXISTS (
+        SELECT 1
+        FROM Recept
+        WHERE idRecept = $idRecept
+          AND autorKorisnikId = $autorKorisnikId
+      )
+      BEGIN
+        THROW 51000, 'Nemaš ovlasti za brisanje ovog recepta ili recept ne postoji.', 1;
+      END
+
+      DELETE FROM ReceptSastojak
+      WHERE idRecept = $idRecept;
+
+      DELETE FROM Recept
+      WHERE idRecept = $idRecept
+        AND autorKorisnikId = $autorKorisnikId;
+
+      COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+      IF @@TRANCOUNT > 0
+        ROLLBACK TRANSACTION;
+      THROW;
+    END CATCH
+  ''');
   }
 
   static Future<Map<String, dynamic>?> getReceptDetaljiById(int idRecept) async {
@@ -430,6 +614,25 @@ class DbQueries {
     return Map<String, dynamic>.from(rows.first);
   }
 
+  static Future<List<Map<String, dynamic>>> getAllSastojciForRecipeDropdown() async {
+    final rows = await _sql.query('''
+    SELECT
+      s.idSastojak,
+      s.ime AS sastojakIme,
+      v.oznakaVelicine,
+      k.imeKategorije AS kategorijaIme
+    FROM Sastojak s
+    LEFT JOIN Velicina v ON v.idVelicina = s.idVelicina
+    LEFT JOIN Kategorija k ON k.idKategorija = s.idKategorija
+    ORDER BY
+      ISNULL(k.imeKategorije, 'Ostalo') ASC,
+      s.ime ASC
+  ''');
+
+    return rows.map((r) => Map<String, dynamic>.from(r)).toList();
+  }
+
+
   static Future<List<Map<String, dynamic>>> getReceptSastojciByReceptId(
       int idRecept,
       ) async {
@@ -450,6 +653,59 @@ class DbQueries {
 
     return rows.map((r) => Map<String, dynamic>.from(r)).toList();
   }
+
+  static Future<Map<int, bool>> getReceptMissingStatusForUser(int idKorisnik) async {
+    final rows = await _sql.query('''
+    SELECT
+      rs.idRecept,
+      MAX(CASE
+            WHEN ISNULL(z.kolicina, 0) < ISNULL(rs.potrebnaKolicina, 0) THEN 1
+            ELSE 0
+          END) AS hasMissing
+    FROM ReceptSastojak rs
+    LEFT JOIN Zaliha z
+      ON z.idSastojak = rs.idSastojak
+     AND z.idKorisnik = $idKorisnik
+    GROUP BY rs.idRecept
+  ''');
+
+    final result = <int, bool>{};
+    for (final row in rows) {
+      final idRecept = int.tryParse(row['idRecept']?.toString() ?? '');
+      final hasMissingRaw = int.tryParse(row['hasMissing']?.toString() ?? '0') ?? 0;
+      if (idRecept != null && idRecept > 0) {
+        result[idRecept] = hasMissingRaw == 1;
+      }
+    }
+    return result;
+  }
+
+  static Future<List<Map<String, dynamic>>> getMissingSastojciForReceptUser({
+    required int idRecept,
+    required int idKorisnik,
+  }) async {
+    final rows = await _sql.query('''
+    SELECT
+      rs.idSastojak,
+      s.ime AS sastojakIme,
+      ISNULL(rs.potrebnaKolicina, 0) AS potrebno,
+      ISNULL(z.kolicina, 0) AS dostupno,
+      (ISNULL(rs.potrebnaKolicina, 0) - ISNULL(z.kolicina, 0)) AS nedostaje,
+      v.oznakaVelicine
+    FROM ReceptSastojak rs
+    INNER JOIN Sastojak s ON s.idSastojak = rs.idSastojak
+    LEFT JOIN Velicina v ON v.idVelicina = s.idVelicina
+    LEFT JOIN Zaliha z
+      ON z.idSastojak = rs.idSastojak
+     AND z.idKorisnik = $idKorisnik
+    WHERE rs.idRecept = $idRecept
+      AND ISNULL(z.kolicina, 0) < ISNULL(rs.potrebnaKolicina, 0)
+    ORDER BY s.ime ASC
+  ''');
+
+    return rows.map((r) => Map<String, dynamic>.from(r)).toList();
+  }
+
 
 
 

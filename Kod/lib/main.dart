@@ -7,6 +7,7 @@ import 'profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'sql_connection.dart';
 import 'zaliheKorisnika.dart';
+import 'recepti.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -120,6 +121,9 @@ class _MyHomePageState extends State<MyHomePage> {
       case 2:
         page = TrgovinaPage(); // Stranica s trgovinom
         break;
+      case 3:
+        page = const ReceptiPage();
+        break;
 
       default:
         page = HomePage();
@@ -156,6 +160,10 @@ class _MyHomePageState extends State<MyHomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.store),
             label: 'Trgovina',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.menu_book),
+            label: 'Recepti',
           ),
 
         ],

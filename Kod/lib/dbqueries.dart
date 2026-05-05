@@ -396,6 +396,62 @@ class DbQueries {
   ''');
   }
 
+  static Future<List<Map<String, dynamic>>> getReceptiList() async {
+    final rows = await _sql.query('''
+    SELECT
+      r.idRecept,
+      r.naziv
+    FROM Recept r
+    ORDER BY r.naziv ASC
+  ''');
+
+    return rows.map((r) => Map<String, dynamic>.from(r)).toList();
+  }
+
+  static Future<Map<String, dynamic>?> getReceptDetaljiById(int idRecept) async {
+    final rows = await _sql.query('''
+    SELECT TOP 1
+      r.idRecept,
+      r.naziv,
+      r.opis,
+      r.vrijemePripreme,
+      r.autorKorisnikId,
+      COALESCE(
+        NULLIF(LTRIM(RTRIM(CONCAT(ISNULL(k.ime, ''), ' ', ISNULL(k.prezime, '')))), ''),
+        k.email,
+        'Nepoznato'
+      ) AS autorIme
+    FROM Recept r
+    LEFT JOIN Korisnik k ON k.idKorisnik = r.autorKorisnikId
+    WHERE r.idRecept = $idRecept
+  ''');
+
+    if (rows.isEmpty) return null;
+    return Map<String, dynamic>.from(rows.first);
+  }
+
+  static Future<List<Map<String, dynamic>>> getReceptSastojciByReceptId(
+      int idRecept,
+      ) async {
+    final rows = await _sql.query('''
+    SELECT
+      rs.idReceptSastojak,
+      rs.idRecept,
+      rs.idSastojak,
+      rs.potrebnaKolicina,
+      s.ime AS sastojakIme,
+      v.oznakaVelicine
+    FROM ReceptSastojak rs
+    INNER JOIN Sastojak s ON s.idSastojak = rs.idSastojak
+    LEFT JOIN Velicina v ON v.idVelicina = s.idVelicina
+    WHERE rs.idRecept = $idRecept
+    ORDER BY s.ime ASC
+  ''');
+
+    return rows.map((r) => Map<String, dynamic>.from(r)).toList();
+  }
+
+
 
 
 

@@ -2,6 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dbqueries.dart';
 
+/* Stranica za recepte.
+Prikazuje sve recepte, omogućuje pretragu po imenu recepta ili po imenu autora.
+Korisnik može dodati novi recept, a ako je on autor nekog recepta, može ga i
+obrisati ili urediti.
+Klikom na pojedini recept otvaraju se detalji recepta, gdje su prikazani svi sastojci
+i vrijeme potrebno za pripremu jela.
+Ako korisnik nema potrebne sastojke za recept, ime recepta je istaknuto crvenom bojom,
+a kad korisnik uđe u detalje recepta, ispod svih sastojaka potrebnih za recept nalazi se popis
+sastojaka koje korisniku nedostaju, zajedno s informacijom koliko mu
+nedostaje svakog sastojka.
+ */
+
 class ReceptiPage extends StatefulWidget {
   const ReceptiPage({super.key});
 

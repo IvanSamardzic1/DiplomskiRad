@@ -4,6 +4,11 @@ import 'package:crypto/crypto.dart';
 
 import 'sql_connection.dart';
 
+/*
+Klasa za sve SQL upite prema bazi. Svi upiti su async i vraćaju Future.
+Metode su organizirane po funkcionalnosti (korisnici, zalihe, recepti, itd.).
+ */
+
 class DbQueries {
   static final SqlConnectionService _sql = SqlConnectionService.instance;
 
@@ -15,7 +20,7 @@ class DbQueries {
     return sha256.convert(bytes).toString();
   }
 
-  // Korisnik po mailu (case-insensitive)
+  // Dohvaćanje korisnika po mailu.
   static Future<Map<String, dynamic>?> getUserByMail(String mail) async {
     final normalizedMail = mail.trim().toLowerCase();
     final safeMail = _sqlEscape(normalizedMail);
@@ -38,11 +43,13 @@ class DbQueries {
 
   }
 
+  // Provjera postoji li korisnik s danim mailom.
   static Future<bool> emailExists(String mail) async {
     final user = await getUserByMail(mail);
     return user != null;
   }
 
+  // Provjera korisničkih kredencijala (mail + plain password).
   static Future<bool> checkUserCredentials(
       String mail,
       String plainPassword,
@@ -56,6 +63,7 @@ class DbQueries {
     return storedHash == inputHash;
   }
 
+  // Umetanje novog korisnika u bazu.
   static Future<void> insertUser({
     required String ime,
     required String prezime,
@@ -73,6 +81,7 @@ class DbQueries {
       ''');
   }
 
+  // Brisanje korisnika po mailu.
   static Future<void> deleteUserByMail(String mail) async {
     final safeMail = _sqlEscape(mail.trim().toLowerCase());
 
@@ -82,6 +91,7 @@ class DbQueries {
   ''');
   }
 
+  // Promjena lozinke korisnika.
   static Future<void> changePassword({
     required String mail,
     required String newPlainPassword,
@@ -96,6 +106,7 @@ class DbQueries {
   ''');
   }
 
+  // Dohvaćanje ID-a korisnika po mailu.
   static Future<int?> getUserIdByMail(String mail) async {
     final safeMail = _sqlEscape(mail.trim().toLowerCase());
 
@@ -111,6 +122,7 @@ class DbQueries {
     return int.tryParse(raw?.toString() ?? '');
   }
 
+  // Dohvaćanje svih zaliha za određenog korisnika, uključujući i kategoriju i veličinu.
   static Future<List<Map<String, dynamic>>> getZaliheForUser(int idKorisnik) async {
     final rows = await _sql.query('''
     SELECT
@@ -136,6 +148,7 @@ class DbQueries {
     return rows.map((row) => Map<String, dynamic>.from(row)).toList();
   }
 
+  // Dohvaćanje svih mogućih kategorija sastojaka.
   static Future<List<Map<String, dynamic>>> getKategorije() async {
     final rows = await _sql.query('''
     SELECT idKategorija, imeKategorije
@@ -146,6 +159,7 @@ class DbQueries {
     return rows.map((r) => Map<String, dynamic>.from(r)).toList();
   }
 
+  // Dohvaćanje svih sastojaka unutar određene kategorije, uključujući i veličinu.
   static Future<List<Map<String, dynamic>>> getSastojciByKategorija(int idKategorija) async {
     final rows = await _sql.query('''
     SELECT
@@ -162,6 +176,7 @@ class DbQueries {
     return rows.map((r) => Map<String, dynamic>.from(r)).toList();
   }
 
+  // Dodavanje nove zalihe ili ažuriranje postojeće za određenog korisnika i sastojak.
   static Future<void> upsertZalihaForUser({
     required int idKorisnik,
     required int idSastojak,
@@ -205,6 +220,7 @@ class DbQueries {
   ''');
   }
 
+  // Dohvaćanje zalihe za određenog korisnika i sastojak (ako postoji).
   static Future<Map<String, dynamic>?> getZalihaItemForUserSastojak({
     required int idKorisnik,
     required int idSastojak,
@@ -226,6 +242,7 @@ class DbQueries {
     return Map<String, dynamic>.from(rows.first);
   }
 
+  // Ažuriranje zalihe po ID.
   static Future<void> updateZalihaById({
     required int idZaliha,
     required int idKorisnik,
@@ -267,6 +284,7 @@ class DbQueries {
   ''');
   }
 
+  // Dohvaćanje svih stavki popisa trgovine za određenog korisnika.
   static Future<List<Map<String, dynamic>>> getStavkePopisaTrgovineForUser(
       int idKorisnik,
       ) async {
@@ -292,6 +310,7 @@ class DbQueries {
     return rows.map((r) => Map<String, dynamic>.from(r)).toList();
   }
 
+  // Dodavanje nove stavke u popis trgovine za određenog korisnika.
   static Future<void> insertStavkaPopisaTrgovine({
     required int idKorisnik,
     required int idSastojak,
@@ -307,6 +326,7 @@ class DbQueries {
   ''');
   }
 
+  // Brisanje stavke popisa trgovine po ID i korisniku.
   static Future<void> deleteStavkaPopisaTrgovineById({
     required int idStavkaPopisa,
     required int idKorisnik,
@@ -320,6 +340,7 @@ class DbQueries {
   }
 
 
+  // Ažuriranje količine stavke popisa trgovine po ID i korisniku.
   static Future<void> updateStavkaPopisaTrgovineKolicina({
     required int idStavkaPopisa,
     required int idKorisnik,
@@ -337,6 +358,7 @@ class DbQueries {
   ''');
   }
 
+  // Simuliranje kupnje stavke i dodavanje u zalihe i zatim brisanje iz popisa trgovine.
   static Future<void> purchaseStavkaPopisaTrgovine({
     required int idKorisnik,
     required int idStavkaPopisa,
@@ -396,6 +418,7 @@ class DbQueries {
   ''');
   }
 
+  // Dohvaćanje svih recepata s imenom autora za prikaz u listi recepata.
   static Future<List<Map<String, dynamic>>> getReceptiList() async {
     final rows = await _sql.query('''
     SELECT
@@ -415,6 +438,7 @@ class DbQueries {
     return rows.map((r) => Map<String, dynamic>.from(r)).toList();
   }
 
+  // Dodavanje novog recepta s pripadajućim sastojcima.
   static Future<int> insertReceptForAuthor({
     required int autorKorisnikId,
     required String naziv,
@@ -486,7 +510,7 @@ class DbQueries {
     return id;
   }
 
-
+  // Ažuriranje recepta i njegovih sastojaka.
   static Future<void> updateReceptByAuthor({
     required int idRecept,
     required int autorKorisnikId,
@@ -557,6 +581,7 @@ class DbQueries {
   }
 
 
+  // Brisanje recepta i njegovih sastojaka.
   static Future<void> deleteReceptByAuthor({
     required int idRecept,
     required int autorKorisnikId,
@@ -592,6 +617,7 @@ class DbQueries {
   ''');
   }
 
+  // Dohvaćanje detalja recepta po ID, uključujući ime autora.
   static Future<Map<String, dynamic>?> getReceptDetaljiById(int idRecept) async {
     final rows = await _sql.query('''
     SELECT TOP 1
@@ -614,6 +640,7 @@ class DbQueries {
     return Map<String, dynamic>.from(rows.first);
   }
 
+  // Dohvaćanje svih sastojaka s kategorijom i veličinom za prikaz u dropdownu pri dodavanju sastojaka u recept.
   static Future<List<Map<String, dynamic>>> getAllSastojciForRecipeDropdown() async {
     final rows = await _sql.query('''
     SELECT
@@ -633,6 +660,7 @@ class DbQueries {
   }
 
 
+  // Dohvaćanje svih sastojaka s imenom i veličinom za određeni recept, za prikaz u detaljima recepta.
   static Future<List<Map<String, dynamic>>> getReceptSastojciByReceptId(
       int idRecept,
       ) async {
@@ -654,6 +682,7 @@ class DbQueries {
     return rows.map((r) => Map<String, dynamic>.from(r)).toList();
   }
 
+  // Dohvaćanje informacija o tome koji recepti imaju nedostajuće sastojke za određenog korisnika, vraća mapu idRecept -> bool (true ako nedostaje, false ako ne nedostaje).
   static Future<Map<int, bool>> getReceptMissingStatusForUser(int idKorisnik) async {
     final rows = await _sql.query('''
     SELECT
@@ -680,6 +709,7 @@ class DbQueries {
     return result;
   }
 
+  // Dohvaćanje nedostajućih sastojaka za određeni recept. 
   static Future<List<Map<String, dynamic>>> getMissingSastojciForReceptUser({
     required int idRecept,
     required int idKorisnik,

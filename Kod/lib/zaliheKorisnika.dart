@@ -246,7 +246,7 @@ class _ZalihaNamirnicePageState extends State<ZalihaNamirnicePage> {
                 final item = _zalihe[index];
                 final kolicina = _toInt(item['kolicina']);
                 final minKolicina = _toInt(item['minKolicina']);
-                final isBelowMin = kolicina < minKolicina;
+                final isBelowMin = kolicina <= minKolicina;
 
                 final sastojakIme = (item['sastojakIme'] ?? '').toString();
                 final kategorijaIme =

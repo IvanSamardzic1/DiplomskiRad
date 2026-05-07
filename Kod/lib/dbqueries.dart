@@ -736,6 +736,159 @@ class DbQueries {
     return rows.map((r) => Map<String, dynamic>.from(r)).toList();
   }
 
+  static String _dateOnlySql(DateTime date) {
+    final d = DateTime(date.year, date.month, date.day);
+    final y = d.year.toString().padLeft(4, '0');
+    final m = d.month.toString().padLeft(2, '0');
+    final day = d.day.toString().padLeft(2, '0');
+    return '$y-$m-$day';
+  }
+
+  // Vraca tipove obroka iz tablice VrstaObroka (dorucak, rucak, vecera)
+  static Future<List<Map<String, dynamic>>> getVrsteObroka() async {
+    final rows = await _sql.query('''
+    SELECT idVrstaObroka, ime
+    FROM VrstaObroka
+    ORDER BY idVrstaObroka ASC
+  ''');
+
+    return rows.map((r) => Map<String, dynamic>.from(r)).toList();
+  }
+
+
+  /// Dohvat plana obroka za period [od, do], ukljucujuci recept i naziv tipa obroka.
+  static Future<List<Map<String, dynamic>>> getPlanObrokaZaPeriod({
+    required int idKorisnik,
+    required DateTime od,
+    required DateTime doDatuma,
+  }) async {
+    final odSql = _dateOnlySql(od);
+    final doSql = _dateOnlySql(doDatuma);
+
+    final rows = await _sql.query('''
+      SELECT
+        p.idPlanObroka,
+        p.idKorisnik,
+        p.idRecept,
+        p.datumObrok,
+        p.tipObroka,
+        ISNULL(p.izvrsen, 0) AS izvrsen,
+        v.ime AS tipObrokaIme,
+        r.naziv AS receptNaziv,
+        r.opis AS receptOpis,
+        r.vrijemePripreme
+      FROM PlanObroka p
+      INNER JOIN VrstaObroka v ON v.idVrstaObroka = p.tipObroka
+      LEFT JOIN Recept r ON r.idRecept = p.idRecept
+      WHERE p.idKorisnik = $idKorisnik
+        AND CAST(p.datumObrok AS DATE) BETWEEN '$odSql' AND '$doSql'
+      ORDER BY p.datumObrok ASC, p.tipObroka ASC
+    ''');
+
+    return rows.map((r) => Map<String, dynamic>.from(r)).toList();
+  }
+
+  /// Upsert plana: za [idKorisnik + datum + tipObroka] postavi recept.
+  static Future<void> upsertPlanObroka({
+    required int idKorisnik,
+    required int idRecept,
+    required DateTime datumObrok,
+    required int tipObrokaId,
+  }) async {
+    final datumSql = _dateOnlySql(datumObrok);
+
+    await _sql.execute('''
+      IF EXISTS (
+        SELECT 1
+        FROM PlanObroka
+        WHERE idKorisnik = $idKorisnik
+          AND CAST(datumObrok AS DATE) = '$datumSql'
+          AND tipObroka = $tipObrokaId
+      )
+      BEGIN
+        UPDATE PlanObroka
+        SET
+          idRecept = $idRecept,
+          izvrsen = 0
+        WHERE idKorisnik = $idKorisnik
+          AND CAST(datumObrok AS DATE) = '$datumSql'
+          AND tipObroka = $tipObrokaId;
+      END
+      ELSE
+      BEGIN
+        INSERT INTO PlanObroka (idKorisnik, idRecept, datumObrok, tipObroka, izvrsen)
+        VALUES ($idKorisnik, $idRecept, '$datumSql', $tipObrokaId, 0);
+      END
+    ''');
+  }
+
+  /// Oznaci obrok kao napravljen i transakcijski smanji zalihe prema receptu.
+  /// Ako nema dovoljno zaliha, baca gresku i NISTA ne mijenja.
+  static Future<void> oznaciObrokKaoNapravljen({
+    required int idPlanObroka,
+    required int idKorisnik,
+  }) async {
+    await _sql.execute('''
+      BEGIN TRY
+        BEGIN TRANSACTION;
+
+        DECLARE @idRecept INT;
+        DECLARE @alreadyDone BIT;
+
+        SELECT TOP 1
+          @idRecept = idRecept,
+          @alreadyDone = ISNULL(izvrsen, 0)
+        FROM PlanObroka
+        WHERE idPlanObroka = $idPlanObroka
+          AND idKorisnik = $idKorisnik;
+
+        IF @idRecept IS NULL
+          THROW 51010, 'Plan obroka ne postoji za ovog korisnika.', 1;
+
+        IF @alreadyDone = 1
+          THROW 51011, 'Obrok je vec oznacen kao napravljen.', 1;
+
+        -- Provjera da nijedna stavka ne ode ispod nule
+        IF EXISTS (
+          SELECT 1
+          FROM ReceptSastojak rs
+          LEFT JOIN Zaliha z
+            ON z.idKorisnik = $idKorisnik
+           AND z.idSastojak = rs.idSastojak
+          WHERE rs.idRecept = @idRecept
+            AND ISNULL(z.kolicina, 0) < ISNULL(rs.potrebnaKolicina, 0)
+        )
+        BEGIN
+          THROW 51012, 'Nema dovoljno zaliha za pripremu ovog obroka.', 1;
+        END
+
+        -- Smanji zalihe
+        UPDATE z
+        SET z.kolicina = z.kolicina - rs.potrebnaKolicina
+        FROM Zaliha z
+        INNER JOIN ReceptSastojak rs
+          ON rs.idSastojak = z.idSastojak
+        WHERE z.idKorisnik = $idKorisnik
+          AND rs.idRecept = @idRecept;
+
+        -- Oznaci plan kao izvrsen
+        UPDATE PlanObroka
+        SET
+          izvrsen = 1
+        WHERE idPlanObroka = $idPlanObroka
+          AND idKorisnik = $idKorisnik;
+
+        COMMIT TRANSACTION;
+      END TRY
+      BEGIN CATCH
+        IF @@TRANCOUNT > 0
+          ROLLBACK TRANSACTION;
+        THROW;
+      END CATCH
+    ''');
+  }
+
+
 
 
 

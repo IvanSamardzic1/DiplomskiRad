@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:projekt_prvaverzija/plan_prehrane.dart';
 import 'package:projekt_prvaverzija/zaliheKorisnika.dart';
 import 'home.dart';
 import 'trgovina.dart';
@@ -8,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'sql_connection.dart';
 import 'zaliheKorisnika.dart';
 import 'recepti.dart';
+import 'plan_prehrane.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -124,6 +126,9 @@ class _MyHomePageState extends State<MyHomePage> {
       case 3:
         page = const ReceptiPage();
         break;
+      case 4:
+        page = const PlanPrehranePage();
+        break;
 
       default:
         page = HomePage();
@@ -164,6 +169,10 @@ class _MyHomePageState extends State<MyHomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.menu_book),
             label: 'Recepti',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_month),
+            label: 'Plan prehrane',
           ),
 
         ],

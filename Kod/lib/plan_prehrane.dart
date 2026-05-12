@@ -211,6 +211,46 @@ class _PlanPrehranePageState extends State<PlanPrehranePage> {
     return null;
   }
 
+  Future<void> _confirmAndDeleteMeal(Map<String, dynamic> planItem) async {
+    if (_idKorisnik == null) return;
+
+    final idPlanObroka = int.tryParse(planItem['idPlanObroka']?.toString() ?? '');
+    if (idPlanObroka == null) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Obriši recept iz obroka'),
+        content: const Text(
+          'Jeste li sigurni da želite obrisati recept iz ovog obroka?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Odustani'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Obriši'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    try {
+      await DbQueries.deletePlanObrokaById(
+        idPlanObroka: idPlanObroka,
+        idKorisnik: _idKorisnik!,
+      );
+      await _refreshPlanOnly();
+    } catch (e) {
+      _showError('Neuspješno brisanje obroka: $e');
+    }
+  }
+
+
   Future<void> _pickAndAssignRecipe({
     required DateTime day,
     required int tipObrokaId,
@@ -530,6 +570,12 @@ class _PlanPrehranePageState extends State<PlanPrehranePage> {
                                       ),
                                       icon: const Icon(Icons.info_outline),
                                       label: const Text('Detalji'),
+                                    ),
+                                  if (item != null && !isDone)
+                                    OutlinedButton.icon(
+                                      onPressed: () => _confirmAndDeleteMeal(item),
+                                      icon: const Icon(Icons.delete_outline),
+                                      label: const Text('Obriši recept'),
                                     ),
                                 ],
                               ),

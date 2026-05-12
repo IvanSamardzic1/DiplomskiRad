@@ -888,6 +888,18 @@ class DbQueries {
     ''');
   }
 
+  /// Brisanje obroka iz plana po id-u (da korisnik može dodati drugi recept).
+  static Future<void> deletePlanObrokaById({
+    required int idPlanObroka,
+    required int idKorisnik,
+  }) async {
+    await _sql.execute('''
+    DELETE FROM PlanObroka
+    WHERE idPlanObroka = $idPlanObroka
+      AND idKorisnik = $idKorisnik
+  ''');
+  }
+
 
 
 

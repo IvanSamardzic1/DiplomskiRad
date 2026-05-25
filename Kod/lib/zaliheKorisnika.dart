@@ -254,6 +254,25 @@ class _ZalihaNamirnicePageState extends State<ZalihaNamirnicePage> {
                 final oznakaVelicine =
                 (item['oznakaVelicine'] ?? '').toString();
                 final datumRoka = _formatDate(item['datum']);
+                final parsedDatum = DateTime.tryParse((item['datum'] ?? '').toString());
+                final todayNow = DateTime.now();
+                final today = DateTime(todayNow.year, todayNow.month, todayNow.day);
+
+                String? expiryWarningText;
+                Color? expiryWarningColor;
+
+                if (parsedDatum != null) {
+                  final expiryDate = DateTime(parsedDatum.year, parsedDatum.month, parsedDatum.day);
+                  final daysToExpiry = expiryDate.difference(today).inDays;
+
+                  if (daysToExpiry < 0) {
+                    expiryWarningText = 'Rok je istekao';
+                    expiryWarningColor = Colors.red;
+                  } else if (daysToExpiry <= 3) {
+                    expiryWarningText = 'Rok trajanja uskoro ističe';
+                    expiryWarningColor = Colors.amber.shade800; // žuto (čitljivije)
+                  }
+                }
 
                 return Card(
                   child: ListTile(
@@ -270,6 +289,15 @@ class _ZalihaNamirnicePageState extends State<ZalihaNamirnicePage> {
                         Text('Kategorija: $kategorijaIme'),
                         Text('Količina: $kolicina $oznakaVelicine'),
                         Text('Rok trajanja: $datumRoka'),
+                        if (expiryWarningText != null)
+                          Text(
+                            expiryWarningText,
+                            style: TextStyle(
+                              color: expiryWarningColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+
                         if (isBelowMin)
                           Text(
                             'Upozorenje: ispod minimalne količine ($minKolicina)',

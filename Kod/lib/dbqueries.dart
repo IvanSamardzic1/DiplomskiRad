@@ -623,7 +623,7 @@ class DbQueries {
     SELECT TOP 1
       r.idRecept,
       r.naziv,
-      r.opis,
+      CAST(r.opis AS NVARCHAR(4000)) AS opis,
       r.vrijemePripreme,
       r.autorKorisnikId,
       COALESCE(

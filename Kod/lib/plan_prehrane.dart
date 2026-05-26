@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'ml_scoring.dart';
 import 'dbqueries.dart';
 
 class PlanPrehranePage extends StatefulWidget {
@@ -13,6 +13,9 @@ class PlanPrehranePage extends StatefulWidget {
 class _PlanPrehranePageState extends State<PlanPrehranePage> {
   bool _loading = true;
   int? _idKorisnik;
+
+  final MlScoring _ml = MlScoring();
+  bool _mlReady = false;
 
   List<Map<String, dynamic>> _vrsteObroka = [];
   List<Map<String, dynamic>> _planRows = [];
@@ -34,6 +37,16 @@ class _PlanPrehranePageState extends State<PlanPrehranePage> {
   @override
   void initState() {
     super.initState();
+    _initMlAndLoad();
+  }
+
+  Future<void> _initMlAndLoad() async {
+    try {
+      await _ml.loadFromAsset('assets/weights.json');
+      _mlReady = true;
+    } catch (_) {
+      _mlReady = false;
+    }
     _initLoad();
   }
 
@@ -49,6 +62,8 @@ class _PlanPrehranePageState extends State<PlanPrehranePage> {
 
     int? selectedTipId;
     int? selectedReceptId;
+    List<int> topMlIds = [];
+    bool loadingTopMl = false;
 
     final saved = await showDialog<bool>(
       context: context,
@@ -77,8 +92,76 @@ class _PlanPrehranePageState extends State<PlanPrehranePage> {
                           child: Text(ime.isEmpty ? 'Obrok' : ime),
                         );
                       }).toList(),
-                      onChanged: (v) => setLocal(() => selectedTipId = v),
+                      onChanged: (v) async {
+                        setLocal(() {
+                          selectedTipId = v;
+                          selectedReceptId = null;
+                          topMlIds = [];
+                          loadingTopMl = v != null;
+                        });
+
+                        if (v == null) return;
+
+                        try {
+                          final ids = await _getTopMlRecommendedRecipeIds(v);
+                          if (!ctx.mounted) return;
+
+                          setLocal(() {
+                            topMlIds = ids;
+                            loadingTopMl = false;
+                          });
+                        } catch (e) {
+                          if (!ctx.mounted) return;
+                          setLocal(() => loadingTopMl = false);
+                          _showError('Greška pri ML preporukama: $e');
+                        }
+
+                      },
                     ),
+                    if (selectedTipId != null) ...[
+                      const SizedBox(height: 10),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'ML preporučeno (Top 3):',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      if (loadingTopMl)
+                        const Align(
+                          alignment: Alignment.centerLeft,
+                          child: SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        )
+                      else if (topMlIds.isEmpty)
+                        const Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Nema ML preporuka za odabrani tip obroka.',
+                            style: TextStyle(color: Colors.black54),
+                          ),
+                        )
+                      else
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: topMlIds.map((id) {
+                            final rec = _recepti.firstWhere(
+                              (r) => int.tryParse(r['idRecept']?.toString() ?? '') == id,
+                              orElse: () => <String, dynamic>{},
+                            );
+                            final naziv = (rec['naziv'] ?? 'Recept #$id').toString();
+                            return ActionChip(
+                              label: Text(naziv),
+                              onPressed: () => setLocal(() => selectedReceptId = id),
+                            );
+                          }).toList(),
+                        ),
+                    ],
                     const SizedBox(height: 12),
                     DropdownButtonFormField<int>(
                       value: selectedReceptId,
@@ -210,6 +293,33 @@ class _PlanPrehranePageState extends State<PlanPrehranePage> {
     }
     return null;
   }
+
+  Future<List<int>> _getTopMlRecommendedRecipeIds(int tipObrokaId) async {
+    if (_idKorisnik == null || !_mlReady) return [];
+
+    final rows = await DbQueries.getMlFeaturesForUserTip(
+      idKorisnik: _idKorisnik!,
+      tipObrokaId: tipObrokaId,
+    );
+
+    final scored = rows.map((r) {
+      final score = _ml.predictProbability({
+        'tipObroka': r['tipObroka'],
+        'vrijemePripremeMin': r['vrijemePripremeMin'],
+        'userOdabranBefore': r['userOdabranBefore'],
+        'userIzvrsenBefore': r['userIzvrsenBefore'],
+        'globalnoIzvrsenBefore': r['globalnoIzvrsenBefore'],
+      });
+      return {
+        'idRecept': int.tryParse(r['idRecept'].toString()) ?? 0,
+        'score': score,
+      };
+    }).toList();
+
+    scored.sort((a, b) => (b['score'] as double).compareTo(a['score'] as double));
+    return scored.take(3).map((e) => e['idRecept'] as int).where((id) => id > 0).toList();
+  }
+
 
   Future<void> _confirmAndDeleteMeal(Map<String, dynamic> planItem) async {
     if (_idKorisnik == null) return;
@@ -598,7 +708,7 @@ class _PlanPrehranePageState extends State<PlanPrehranePage> {
                                       ),
                                       Checkbox(
                                         value: isDone,
-                                        onChanged: (item == null || !isSelected || isDone)
+                                        onChanged: (!isSelected || isDone)
                                             ? null
                                             : (_) => _confirmAndMarkDone(item),
                                       ),

@@ -907,6 +907,44 @@ class DbQueries {
   ''');
   }
 
+  static Future<List<Map<String, dynamic>>> getMlFeaturesForUserTip({
+    required int idKorisnik,
+    required int tipObrokaId,
+  }) async {
+    final rows = await _sql.query('''
+    SELECT
+      r.idRecept,
+      $tipObrokaId AS tipObroka,
+      ISNULL(r.vrijemePripreme, 0) AS vrijemePripremeMin,
+      ISNULL(uo.userOdabranBefore, 0) AS userOdabranBefore,
+      ISNULL(ui.userIzvrsenBefore, 0) AS userIzvrsenBefore,
+      ISNULL(ge.globalnoIzvrsenBefore, 0) AS globalnoIzvrsenBefore
+    FROM Recept r
+    LEFT JOIN (
+      SELECT idRecept, COUNT(*) AS userOdabranBefore
+      FROM PlanObroka
+      WHERE idKorisnik = $idKorisnik AND ISNULL(odabran, 0) = 1
+      GROUP BY idRecept
+    ) uo ON uo.idRecept = r.idRecept
+    LEFT JOIN (
+      SELECT idRecept, COUNT(*) AS userIzvrsenBefore
+      FROM PlanObroka
+      WHERE idKorisnik = $idKorisnik AND ISNULL(izvrsen, 0) = 1
+      GROUP BY idRecept
+    ) ui ON ui.idRecept = r.idRecept
+    LEFT JOIN (
+      SELECT idRecept, COUNT(*) AS globalnoIzvrsenBefore
+      FROM PlanObroka
+      WHERE ISNULL(izvrsen, 0) = 1
+      GROUP BY idRecept
+    ) ge ON ge.idRecept = r.idRecept
+    ORDER BY r.naziv ASC
+  ''');
+
+    return rows.map((r) => Map<String, dynamic>.from(r)).toList();
+  }
+
+
 
 
 

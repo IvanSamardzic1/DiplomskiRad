@@ -29,3 +29,5 @@ Thumbs.db
 # Keystore (VAŽNO - sigurnost)
 *.jks
 *.keystore
+
+Dodatni kod/.venv/

@@ -498,7 +498,9 @@ class _PlanPrehranePageState extends State<PlanPrehranePage> {
                   final item = _findPlanItem(day: day, tipObrokaId: tipId);
 
                   final receptNaziv = (item?['receptNaziv'] ?? '').toString();
+                  final isSelected = _isDoneValue(item?['odabran']);
                   final isDone = _isDoneValue(item?['izvrsen']);
+
 
                   final blokBoja = isDone ? Colors.green.shade100 : Colors.white;
                   final rubBoja =
@@ -596,7 +598,7 @@ class _PlanPrehranePageState extends State<PlanPrehranePage> {
                                       ),
                                       Checkbox(
                                         value: isDone,
-                                        onChanged: isDone
+                                        onChanged: (item == null || !isSelected || isDone)
                                             ? null
                                             : (_) => _confirmAndMarkDone(item),
                                       ),

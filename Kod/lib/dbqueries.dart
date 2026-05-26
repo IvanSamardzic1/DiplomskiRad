@@ -772,6 +772,7 @@ class DbQueries {
         p.idRecept,
         p.datumObrok,
         p.tipObroka,
+        ISNULL(p.odabran, 0) as odabran,
         ISNULL(p.izvrsen, 0) AS izvrsen,
         v.ime AS tipObrokaIme,
         r.naziv AS receptNaziv,
@@ -809,6 +810,7 @@ class DbQueries {
         UPDATE PlanObroka
         SET
           idRecept = $idRecept,
+          odabran = 1,
           izvrsen = 0
         WHERE idKorisnik = $idKorisnik
           AND CAST(datumObrok AS DATE) = '$datumSql'
@@ -816,8 +818,8 @@ class DbQueries {
       END
       ELSE
       BEGIN
-        INSERT INTO PlanObroka (idKorisnik, idRecept, datumObrok, tipObroka, izvrsen)
-        VALUES ($idKorisnik, $idRecept, '$datumSql', $tipObrokaId, 0);
+        INSERT INTO PlanObroka (idKorisnik, idRecept, datumObrok, tipObroka, odabran, izvrsen)
+        VALUES ($idKorisnik, $idRecept, '$datumSql', $tipObrokaId, 1, 0);
       END
     ''');
   }
@@ -834,10 +836,12 @@ class DbQueries {
 
         DECLARE @idRecept INT;
         DECLARE @alreadyDone BIT;
+        DECLARE @isSelected BIT;
 
         SELECT TOP 1
           @idRecept = idRecept,
-          @alreadyDone = ISNULL(izvrsen, 0)
+          @alreadyDone = ISNULL(izvrsen, 0),
+          @isSelected = ISNULL(odabran, 0)
         FROM PlanObroka
         WHERE idPlanObroka = $idPlanObroka
           AND idKorisnik = $idKorisnik;
@@ -847,6 +851,9 @@ class DbQueries {
 
         IF @alreadyDone = 1
           THROW 51011, 'Obrok je vec oznacen kao napravljen.', 1;
+        
+        IF @isSelected = 0
+          THROW 51013, 'Obrok nije odabran, ne moze se oznaciti kao napravljen.', 1;
 
         -- Provjera da nijedna stavka ne ode ispod nule
         IF EXISTS (

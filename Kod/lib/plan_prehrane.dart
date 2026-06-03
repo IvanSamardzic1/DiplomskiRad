@@ -660,7 +660,7 @@ class _PlanPrehranePageState extends State<PlanPrehranePage> {
                                 spacing: 8,
                                 runSpacing: 8,
                                 children: [
-                                  ElevatedButton.icon(
+                                  /*ElevatedButton.icon(
                                     onPressed: () => _pickAndAssignRecipe(
                                       day: day,
                                       tipObrokaId: tipId,
@@ -671,7 +671,7 @@ class _PlanPrehranePageState extends State<PlanPrehranePage> {
                                           ? 'Dodaj recept'
                                           : 'Promijeni recept',
                                     ),
-                                  ),
+                                  ),*/
                                   if (item != null &&
                                       int.tryParse(
                                           item['idRecept']?.toString() ?? '') !=

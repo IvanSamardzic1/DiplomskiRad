@@ -58,4 +58,4 @@ payload = {
 with open("../Kod/assets/weights.json", "w", encoding="utf-8") as f:
     json.dump(payload, f, ensure_ascii=True, indent=2)
 
-print("Saved model to assets/ml/weights.json")
+print("Saved model to assets/weights.json")

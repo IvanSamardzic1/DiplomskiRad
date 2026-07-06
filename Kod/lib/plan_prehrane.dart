@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'ml_scoring.dart';
 import 'dbqueries.dart';
+import 'heuristika.dart';
 
 class PlanPrehranePage extends StatefulWidget {
   const PlanPrehranePage({super.key});
@@ -56,6 +57,7 @@ class _PlanPrehranePageState extends State<PlanPrehranePage> {
     return s == '1' || s == 'true';
   }
 
+
   Future<void> _openAddMealDialogForSelectedDay() async {
     if (_idKorisnik == null) return;
     final selectedDay = _days[_selectedDayIndex];
@@ -64,6 +66,8 @@ class _PlanPrehranePageState extends State<PlanPrehranePage> {
     int? selectedReceptId;
     List<int> topMlIds = [];
     bool loadingTopMl = false;
+    List<int> topHeuristicIds = [];
+    bool loadingTopHeuristic = false;
 
     final saved = await showDialog<bool>(
       context: context,
@@ -97,26 +101,35 @@ class _PlanPrehranePageState extends State<PlanPrehranePage> {
                           selectedTipId = v;
                           selectedReceptId = null;
                           topMlIds = [];
+                          topHeuristicIds = [];
                           loadingTopMl = v != null;
+                          loadingTopHeuristic = v != null;
                         });
 
                         if (v == null) return;
 
                         try {
-                          final ids = await _getTopMlRecommendedRecipeIds(v);
+                          final mlIds = await _getTopMlRecommendedRecipeIds(v);
+                          final heuristicIds = await _getTopHeuristicRecommendedRecipeIds(v);
+
                           if (!ctx.mounted) return;
 
                           setLocal(() {
-                            topMlIds = ids;
+                            topMlIds = mlIds;
+                            topHeuristicIds = heuristicIds;
                             loadingTopMl = false;
+                            loadingTopHeuristic = false;
                           });
                         } catch (e) {
                           if (!ctx.mounted) return;
-                          setLocal(() => loadingTopMl = false);
-                          _showError('Greška pri ML preporukama: $e');
+                          setLocal(() {
+                            loadingTopMl = false;
+                            loadingTopHeuristic = false;
+                          });
+                          _showError('Greška pri preporukama: $e');
                         }
-
                       },
+
                     ),
                     if (selectedTipId != null) ...[
                       const SizedBox(height: 10),
@@ -161,7 +174,51 @@ class _PlanPrehranePageState extends State<PlanPrehranePage> {
                             );
                           }).toList(),
                         ),
+                      const SizedBox(height: 10),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Heuristika preporučeno (Top 3):',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      if (loadingTopHeuristic)
+                        const Align(
+                          alignment: Alignment.centerLeft,
+                          child: SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        )
+                      else if (topHeuristicIds.isEmpty)
+                        const Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Nema heurističkih preporuka za odabrani tip obroka.',
+                            style: TextStyle(color: Colors.black54),
+                          ),
+                        )
+                      else
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: topHeuristicIds.map((id) {
+                            final rec = _recepti.firstWhere(
+                                  (r) => int.tryParse(r['idRecept']?.toString() ?? '') == id,
+                              orElse: () => <String, dynamic>{},
+                            );
+                            final naziv = (rec['naziv'] ?? 'Recept #$id').toString();
+                            return ActionChip(
+                              label: Text(naziv),
+                              onPressed: () => setLocal(() => selectedReceptId = id),
+                            );
+                          }).toList(),
+                        ),
+
                     ],
+
                     const SizedBox(height: 12),
                     DropdownButtonFormField<int>(
                       value: selectedReceptId,
@@ -319,6 +376,46 @@ class _PlanPrehranePageState extends State<PlanPrehranePage> {
     scored.sort((a, b) => (b['score'] as double).compareTo(a['score'] as double));
     return scored.take(3).map((e) => e['idRecept'] as int).where((id) => id > 0).toList();
   }
+
+  int _toInt(dynamic v) {
+    if (v == null) return 0;
+    if (v is int) return v;
+    if (v is num) return v.toInt();
+    return int.tryParse(v.toString()) ?? 0;
+  }
+
+  double _toDouble(dynamic v) {
+    if (v == null) return 0.0;
+    if (v is double) return v;
+    if (v is num) return v.toDouble();
+    return double.tryParse(v.toString()) ?? 0.0;
+  }
+
+  Future<List<int>> _getTopHeuristicRecommendedRecipeIds(int tipObrokaId) async {
+    if (_idKorisnik == null) return [];
+
+    final rows = await DbQueries.getHeuristicCandidatesForUser(
+      idKorisnik: _idKorisnik!,
+    );
+
+    final candidates = rows.map((r) {
+      return HeuristikaKandidat(
+        receptId: _toInt(r['idRecept']),
+        vrijemePripremeMin: _toInt(r['vrijemePripremeMin']),
+        pokrivenostZaliha: _toDouble(r['pokrivenostZaliha']),
+        fifoSignal: _toDouble(r['fifoSignal']),
+        userOdabranCount: _toInt(r['userOdabranCount']),
+        userIzvrsenCount: _toInt(r['userIzvrsenCount']),
+      );
+    }).toList();
+
+    return Heuristika.topRecipeIds(
+      candidates: candidates,
+      trazeniTipObrokaId: tipObrokaId,
+      limit: 3,
+    );
+  }
+
 
 
   Future<void> _confirmAndDeleteMeal(Map<String, dynamic> planItem) async {

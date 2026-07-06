@@ -1,0 +1,193 @@
+\documentclass[diplomskirad]{fer}
+% Dodaj opciju upload za generiranje konačne verzije koja se učitava na FERWeb
+% Add the option upload to generate the final version which is uploaded to FERWeb
+
+
+\usepackage{blindtext}
+
+
+%--- PODACI O RADU / THESIS INFORMATION ----------------------------------------
+
+% Naslov na engleskom jeziku / Title in English
+\title{Meal planning and grocery inventory tracking on Android mobile devices}
+
+% Naslov na hrvatskom jeziku / Title in Croatian
+\naslov{Planiranje obroka i praćenje zaliha namirnica na Android mobilnim uređajima}
+
+% Broj rada / Thesis number
+\brojrada{1326}
+
+% Autor / Author
+\author{Ivan Samardžić}
+
+% Mentor 
+\mentor{prof. dr. sc. Hrvoje Mlinarić}
+
+% Datum rada na engleskom jeziku / Date in English
+\date{June, 2026}
+
+% Datum rada na hrvatskom jeziku / Date in Croatian
+\datum{lipanj, 2026.}
+
+%-------------------------------------------------------------------------------
+
+
+\begin{document}
+
+
+% Naslovnica se automatski generira / Titlepage is automatically generated
+\maketitle
+
+
+%--- ZADATAK / THESIS ASSIGNMENT -----------------------------------------------
+
+% Zadatak se ubacuje iz vanjske datoteke / Thesis assignment is included from external file
+% Upiši ime PDF datoteke preuzete s FERWeb-a / Enter the filename of the PDF downloaded from FERWeb
+\zadatak{dodatci/hr_0036530712_89.pdf}
+
+
+%--- ZAHVALE / ACKNOWLEDGMENT --------------------------------------------------
+
+\begin{zahvale}
+  % Ovdje upišite zahvale / Write in the acknowledgment
+  Ponajprije se zahvaljujem dragom Bogu što me vodi na životnom putu te na svemu što mi je podario i omogućio. Nadalje, želim se zahvaliti svojoj obitelji na svoj darovanoj potpori, podršci i ljubavi tijekom cijelog života i studiranja. Hvala i mojim prijateljima koji su me motivirali, hrabrili i bili uz mene tijekom napornih dana. Posebno zahvaljujem svom mentoru prof. dr. sc. Hrvoju Mlinariću na praćenju ovog rada i pomoći tijekom njegove izrade.
+\end{zahvale}
+
+
+% Odovud započinje numeriranje stranica / Page numbering starts from here
+\mainmatter
+
+
+%--- SAŽETAK / ABSTRACT --------------------------------------------------------
+
+% Sažetak na hrvatskom
+\begin{sazetak}
+Ovaj rad opisuje aplikaciju koja je razvijena kao diplomski projekt za upravljanje prehranom i organizaciju obroka korisnika. Zadaća aplikacije je unaprijediti organizaciju prehrane i potaknuti zdravije životne navike korisnika omogućavanjem evidencije namirnica te pametnijom organizacijom obroka. Korisnik pomoću aplikacije može samostalno planirati obroke za naredne dane na temelju dostupnih namirnica, izrađivati popise za kupovinu i upravljati svojim namirnicama. U radu je provedena i usporedba prijedloga recepata za obroke dobivenih primjenom algoritma strojnog učenja i prijedloga temeljenih na heurističkom pristupu. Također su opisani implementacija aplikacije, način prijenosa korisničkih podataka na različite uređaje i provedeni jedinični i funkcijski testovi.
+
+\end{sazetak}
+
+\begin{kljucnerijeci}
+  Android, planiranje obroka, zalihe namirnica, strojno učenje, popis za trgovinu
+\end{kljucnerijeci}
+
+
+% Abstract in English
+\begin{abstract}
+  This master's thesis describes an application developed for nutrition management and meal planning. The purpose of the application is to improve meal planning and encourage healthier eating habits by enabling users to keep track of food items and organize their meals more efficiently. Using the application, users can independently plan meals for upcoming days based on the available ingredients, create shopping lists, and manage their food inventory. The thesis also presents a comparison of meal recipe recommendations obtained using a machine learning algorithm and recommendations based on a heuristic approach. Furthermore, it describes the implementation of the application, the method used for synchronizing user data across multiple devices, and the conducted unit and functional tests.
+
+\end{abstract}
+
+\begin{keywords}
+  Android, meal planning, food supplies, machine learning, shopping list
+\end{keywords}
+
+
+% Sadržaj se automatski generira / Table of contents is automatically generated
+\tableofcontents
+
+
+%--- UVOD / INTRODUCTION -------------------------------------------------------
+\chapter{Uvod}
+\label{pog:uvod}
+
+U današnjem vremenu sve je obilježeno ubrzanim načinom života i sve većim brojem obaveza te se pokušava sve digitalizirati i olakšati te je iz toga proizašla ideja za razvojem aplikacije koja će pojedincu olakšati planiranje obroka i planiranje namirnica, bez obzira na to gdje se nalazi. Pa kao takva, ova mobilna aplikacija je stvorena kako bi korisniku bilo puno lakše saznati što od namirnica već ima kod kuće, bez da stoji direktno pred hladnjakom te kako bi na temelju toga mogao izabrati što jesti za koji obrok, što kupiti i slično. Unatoč velikom broju već dostupnih aplikacija, mnoge od njih nude samo djelomična rješenja poput vođenja popisa ili praćenja kalorijskog unosa, dok je integracija upravljanja zalihama često ograničena. 
+
+U sljedećim poglavljima biti će prikazan pregled korištenih tehnologija i koncepata korištenih u razvoju aplikacije, opis arhitekture i implementacijskih detalja, baze podataka te na samom kraju rezultati testiranja i ideje za moguća poboljšanja same aplikacije
+
+\section{Slične aplikacije}
+
+Kao što je navedeno u uvodu, postoje mnoge aplikacije koje imaju slične ciljeve i funkcionalnosti, no u svakoj postoji mjesta za napredak. Navest ću 2 najpopularnije.
+
+\subsubsection{Paprika Recipe Manager}
+To je aplikacija namijenjena organizaciji recepata, planiranju obroka i popisa za kupovinu. Korisnicima omogućava spremanje recepata iz različitih internetskih izvora te planiranje obroka pomoću ugrađenog kalendara
+
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.38\linewidth]{dodatci/paprika.png} 
+  \caption{Paprika Recipe Manager}
+  \label{slk:prvaslika}
+\end{figure}
+
+\subsubsection{Plan To Eat}
+Plan To Eat je aplikacija usmjerena na jednostavno planiranje obroka i organizaciju kupovine. Korisnici mogu uvoziti vlastite recepte, raspoređivati ih u kalendar obroka te automatski generirati popise za kupovinu namirnica.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.38\linewidth]{dodatci/plantoeat.png} 
+  \caption{PlanToEat}
+  \label{slk:prvaslika}
+\end{figure}
+%-------------------------------------------------------------------------------
+\chapter{Implementacija aplikacije}
+
+\section{Opis aplikacije i korištene tehnologije}
+
+\section{Funkcionalni i nefunkcionalni zahtjevi}
+
+\section{Arhitektura aplikacije}
+
+\section{Baza podataka}
+
+\section{Objašnjenja funkcionalnosti}
+\subsection{Prijava i registracija korisnika}
+\subsection{Zalihe namirnica}
+\subsection{Popis za trgovinu}
+\subsection{Planiranje obroka}
+\subsection{Strojno učenje i heuristika}
+\subsection{Jedinični i funkcionalni testovi}
+
+\label{pog:glavni_dio}
+
+
+%-------------------------------------------------------------------------------
+\chapter{Rezultati i rasprava}
+\label{pog:rezultati_i_rasprava}
+
+
+
+
+%--- ZAKLJUČAK / CONCLUSION ----------------------------------------------------
+\chapter{Zaključak}
+\label{pog:zakljucak}
+
+
+
+
+%--- LITERATURA / REFERENCES ---------------------------------------------------
+
+% Literatura se automatski generira iz zadane .bib datoteke / References are automatically generated from the supplied .bib file
+% Upiši ime BibTeX datoteke bez .bib nastavka / Enter the name of the BibTeX file without .bib extension
+\bibliography{literatura}
+
+
+%--- IZJAVA O UI / STATEMENT ON AI ---------------------------------------------
+
+% Zadani naslov izjave se može promijeniti zadavanjem argumenta. / Default statement title may be changed by entering the argument here.
+\begin{izjavaoui}
+
+  Ako ste koristili umjetnu inteligenciju prilikom izrade svog rada,
+  na ovom mjestu navedite korištene tehnologije, njihove verzije i svrhu korištenja.
+
+  \paragraph{Osvrt na korištenje umjetne inteligencije:}
+  Ukratko opišite opseg vlastitih intervencija i dorada generiranog sadržaja te, ako je primjenjivo,
+  navedite procjenu točnosti, uočena ograničenja ili halucinacije korištene umjetne inteligencije.
+
+  \paragraph{Izjava o korištenju umjetne inteligencije:}
+  Potvrđujem da sam tijekom izrade ovog diplomskog rada koristio umjetnu inteligenciju u skladu s
+  Politikom primjerenog korištenja umjetne inteligencije na Fakultetu elektrotehnike i računarstva,
+  te da umjetna inteligencija nije zamijenila moje kritičko razmišljanje niti moj doprinos.
+  
+\end{izjavaoui}
+
+
+%--- PRIVITCI / APPENDIX -------------------------------------------------------
+
+% Sva poglavlja koja slijede će biti označena slovom i riječi privitak / All following chapters will be denoted with an appendix and a letter
+\backmatter
+
+\chapter{The Code}
+
+
+
+\end{document}

@@ -1,12 +1,13 @@
 # Diplomski rad
 
 Planiranje obroka i praćenje zaliha namirnica na Android mobilnim uređajima
+
 Student: Ivan Samardžić
+
 Mentor: prof. dr. sc. Hrvoje Mlinarić
 
 ## Zadatak
 
-Opis zadatka:
 Potrebno je projektirati mobilnu aplikaciju za operacijski sustav Android koja će omogućiti praćenje zaliha
 namirnica te planiranje obroka. Izrada aplikacije motivirana je sa željom za poboljšavanjem životnih navika i
 zdravijom prehranom. Osnovna funkcionalnost mobilne aplikacije mora biti vođenje zaliha namirnica, te

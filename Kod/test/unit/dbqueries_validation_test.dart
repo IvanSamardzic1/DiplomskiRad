@@ -17,6 +17,32 @@ void main() {
 
       expect(a, isNot(b));
     });
+
+    test('prazan string daje valjani hash duljine 64', () {
+      final hash = DbQueries.hashPassword('');
+
+      expect(hash.length, 64);
+      expect(hash, DbQueries.hashPassword(''));
+    });
+
+    test('jako dugi string daje valjani hash duljine 64', () {
+      final longInput = 'a' * 10000;
+      final hash = DbQueries.hashPassword(longInput);
+
+      expect(hash.length, 64);
+      expect(hash, DbQueries.hashPassword(longInput));
+    });
+
+    test('Unicode/hrvatski znakovi daju konzistentan i ispravan hash', () {
+      const password = 'lozinkaČćžšđ123!@#';
+      final a = DbQueries.hashPassword(password);
+      final b = DbQueries.hashPassword(password);
+
+      expect(a, b);
+      expect(a.length, 64);
+      // Razlicit unicode string mora dati drugaciji hash.
+      expect(a, isNot(DbQueries.hashPassword('lozinkaČćžšđ124!@#')));
+    });
   });
 
   group('DbQueries validacije prije SQL poziva', () {
@@ -145,6 +171,176 @@ void main() {
           opis: 'opis',
           vrijemePripremeMin: 10,
           sastojci: const [],
+        ),
+        throwsA(isA<Exception>()),
+      );
+    });
+
+    test('insertReceptForAuthor baca gresku za idSastojak == null', () async {
+      await expectLater(
+        DbQueries.insertReceptForAuthor(
+          autorKorisnikId: 1,
+          naziv: 'Test recept',
+          opis: 'opis',
+          vrijemePripremeMin: 10,
+          sastojci: const [
+            {'idSastojak': null, 'potrebnaKolicina': 1}
+          ],
+        ),
+        throwsA(isA<Exception>()),
+      );
+    });
+
+    test('insertReceptForAuthor baca gresku za idSastojak <= 0', () async {
+      await expectLater(
+        DbQueries.insertReceptForAuthor(
+          autorKorisnikId: 1,
+          naziv: 'Test recept',
+          opis: 'opis',
+          vrijemePripremeMin: 10,
+          sastojci: const [
+            {'idSastojak': 0, 'potrebnaKolicina': 1}
+          ],
+        ),
+        throwsA(isA<Exception>()),
+      );
+    });
+
+    test('insertReceptForAuthor baca gresku za potrebnaKolicina == null', () async {
+      await expectLater(
+        DbQueries.insertReceptForAuthor(
+          autorKorisnikId: 1,
+          naziv: 'Test recept',
+          opis: 'opis',
+          vrijemePripremeMin: 10,
+          sastojci: const [
+            {'idSastojak': 1, 'potrebnaKolicina': null}
+          ],
+        ),
+        throwsA(isA<Exception>()),
+      );
+    });
+
+    test('insertReceptForAuthor baca gresku za potrebnaKolicina <= 0', () async {
+      await expectLater(
+        DbQueries.insertReceptForAuthor(
+          autorKorisnikId: 1,
+          naziv: 'Test recept',
+          opis: 'opis',
+          vrijemePripremeMin: 10,
+          sastojci: const [
+            {'idSastojak': 1, 'potrebnaKolicina': 0}
+          ],
+        ),
+        throwsA(isA<Exception>()),
+      );
+    });
+
+    test('updateReceptByAuthor baca gresku kad je naziv prazan', () async {
+      await expectLater(
+        DbQueries.updateReceptByAuthor(
+          idRecept: 1,
+          autorKorisnikId: 1,
+          naziv: '   ',
+          opis: 'opis',
+          vrijemePripremeMin: 10,
+          sastojci: const [
+            {'idSastojak': 1, 'potrebnaKolicina': 1}
+          ],
+        ),
+        throwsA(isA<Exception>()),
+      );
+    });
+
+    test('updateReceptByAuthor baca gresku kad je vrijeme <= 0', () async {
+      await expectLater(
+        DbQueries.updateReceptByAuthor(
+          idRecept: 1,
+          autorKorisnikId: 1,
+          naziv: 'Test recept',
+          opis: 'opis',
+          vrijemePripremeMin: 0,
+          sastojci: const [
+            {'idSastojak': 1, 'potrebnaKolicina': 1}
+          ],
+        ),
+        throwsA(isA<Exception>()),
+      );
+    });
+
+    test('updateReceptByAuthor baca gresku kad nema sastojaka', () async {
+      await expectLater(
+        DbQueries.updateReceptByAuthor(
+          idRecept: 1,
+          autorKorisnikId: 1,
+          naziv: 'Test recept',
+          opis: 'opis',
+          vrijemePripremeMin: 10,
+          sastojci: const [],
+        ),
+        throwsA(isA<Exception>()),
+      );
+    });
+
+    test('updateReceptByAuthor baca gresku za idSastojak == null', () async {
+      await expectLater(
+        DbQueries.updateReceptByAuthor(
+          idRecept: 1,
+          autorKorisnikId: 1,
+          naziv: 'Test recept',
+          opis: 'opis',
+          vrijemePripremeMin: 10,
+          sastojci: const [
+            {'idSastojak': null, 'potrebnaKolicina': 1}
+          ],
+        ),
+        throwsA(isA<Exception>()),
+      );
+    });
+
+    test('updateReceptByAuthor baca gresku za idSastojak <= 0', () async {
+      await expectLater(
+        DbQueries.updateReceptByAuthor(
+          idRecept: 1,
+          autorKorisnikId: 1,
+          naziv: 'Test recept',
+          opis: 'opis',
+          vrijemePripremeMin: 10,
+          sastojci: const [
+            {'idSastojak': -1, 'potrebnaKolicina': 1}
+          ],
+        ),
+        throwsA(isA<Exception>()),
+      );
+    });
+
+    test('updateReceptByAuthor baca gresku za potrebnaKolicina == null', () async {
+      await expectLater(
+        DbQueries.updateReceptByAuthor(
+          idRecept: 1,
+          autorKorisnikId: 1,
+          naziv: 'Test recept',
+          opis: 'opis',
+          vrijemePripremeMin: 10,
+          sastojci: const [
+            {'idSastojak': 1, 'potrebnaKolicina': null}
+          ],
+        ),
+        throwsA(isA<Exception>()),
+      );
+    });
+
+    test('updateReceptByAuthor baca gresku za potrebnaKolicina <= 0', () async {
+      await expectLater(
+        DbQueries.updateReceptByAuthor(
+          idRecept: 1,
+          autorKorisnikId: 1,
+          naziv: 'Test recept',
+          opis: 'opis',
+          vrijemePripremeMin: 10,
+          sastojci: const [
+            {'idSastojak': 1, 'potrebnaKolicina': -5}
+          ],
         ),
         throwsA(isA<Exception>()),
       );

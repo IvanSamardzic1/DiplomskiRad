@@ -256,6 +256,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     },
                   ),
                 ),
+                validator: (value) => _requiredValidator(value, 'Lozinka'),
               ),
               const SizedBox(height: 16),
               SizedBox(

@@ -141,5 +141,86 @@ void main() {
       expect(top.first, 1);
       expect(top, isNot(contains(2)));
     });
+
+    test('prazna lista kandidata vraca prazan popis bez greske', () {
+      final top = Heuristika.topRecipeIds(
+        candidates: const [],
+        trazeniTipObrokaId: TipObroka.rucak,
+        limit: 3,
+      );
+
+      expect(top, isEmpty);
+    });
+
+    test('limit veci od broja kandidata vraca sve kandidate', () {
+      final kandidati = [
+        _kandidat(
+          receptId: 1,
+          vrijeme: 18,
+          pokrivenost: 1.0,
+          fifo: 1.0,
+          odabran: 4,
+          izvrsen: 4,
+        ),
+        _kandidat(
+          receptId: 2,
+          vrijeme: 25,
+          pokrivenost: 0.9,
+          fifo: 0.9,
+          odabran: 2,
+          izvrsen: 3,
+        ),
+      ];
+
+      final top = Heuristika.topRecipeIds(
+        candidates: kandidati,
+        trazeniTipObrokaId: TipObroka.rucak,
+        limit: 10,
+      );
+
+      expect(top.length, 2);
+      expect(top, containsAll(<int>[1, 2]));
+    });
+  });
+
+  group('Heuristika edge case - ekstremni minimum', () {
+    test('kandidat s pokrivenostZaliha = 0.0 i fifoSignal = 0.0 daje valjan score u rasponu', () {
+      final kandidat = _kandidat(
+        receptId: 99,
+        vrijeme: 20,
+        pokrivenost: 0.0,
+        fifo: 0.0,
+        odabran: 0,
+        izvrsen: 0,
+      );
+
+      final score = Heuristika.score(
+        c: kandidat,
+        trazeniTipObrokaId: TipObroka.rucak,
+      );
+
+      expect(score, inInclusiveRange(0.0, 100.0));
+    });
+
+    test('topRecipeIds ne baca gresku kad je jedini kandidat na ekstremnom minimumu', () {
+      final kandidati = [
+        _kandidat(
+          receptId: 99,
+          vrijeme: 20,
+          pokrivenost: 0.0,
+          fifo: 0.0,
+          odabran: 0,
+          izvrsen: 0,
+        ),
+      ];
+
+      final top = Heuristika.topRecipeIds(
+        candidates: kandidati,
+        trazeniTipObrokaId: TipObroka.rucak,
+        limit: 3,
+      );
+
+      expect(top, [99]);
+    });
   });
 }

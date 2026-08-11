@@ -1,0 +1,16 @@
+Datoteka                                                   Pokriveno   Ukupno       %
+------------------------------------------------------------------------------------------
+lib\zaliheKorisnika.dart                                          29      443    6.5%
+lib\trgovina.dart                                                 29      340    8.5%
+lib\recepti.dart                                                  45      500    9.0%
+lib\plan_prehrane.dart                                            69      364   19.0%
+lib\dbqueries.dart                                                63      232   27.2%
+lib\profile.dart                                                  60      128   46.9%
+lib\sql_connection.dart                                           14       21   66.7%
+lib\authscreen.dart                                              105      151   69.5%
+lib\main.dart                                                     40       56   71.4%
+lib\heuristika.dart                                               37       42   88.1%
+lib\home.dart                                                     14       14  100.0%
+lib\ml_scoring.dart                                               20       20  100.0%
+------------------------------------------------------------------------------------------
+UKUPNO                                                           525     2311   22.7%

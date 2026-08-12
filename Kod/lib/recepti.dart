@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dbqueries.dart';
+import 'test_seams.dart';
 
 /* Stranica za recepte.
 Prikazuje sve recepte, omogućuje pretragu po imenu recepta ili po imenu autora.
@@ -15,11 +15,20 @@ nedostaje svakog sastojka.
  */
 
 class ReceptiPage extends StatefulWidget {
-  const ReceptiPage({super.key});
+  final AppRepository repository;
+  final SessionStore sessionStore;
+
+  const ReceptiPage({
+    super.key,
+    AppRepository? repository,
+    SessionStore? sessionStore,
+  })  : repository = repository ?? const DbAppRepository(),
+        sessionStore = sessionStore ?? const SharedPrefsSessionStore();
 
   @override
   State<ReceptiPage> createState() => _ReceptiPageState();
 }
+
 
 class _ReceptiPageState extends State<ReceptiPage> {
   bool _isLoading = true;
@@ -50,13 +59,11 @@ class _ReceptiPageState extends State<ReceptiPage> {
 
 
   Future<int?> _resolveCurrentUserId() async {
-    final prefs = await SharedPreferences.getInstance();
-    final loggedInEmail =
-    (prefs.getString('loggedInEmail') ?? '').trim().toLowerCase();
-
+    final loggedInEmail = (await widget.sessionStore.getLoggedInEmail() ?? '').trim().toLowerCase();
     if (loggedInEmail.isEmpty) return null;
-    return DbQueries.getUserIdByMail(loggedInEmail);
+    return widget.repository.getUserIdByMail(loggedInEmail);
   }
+
 
   int _toInt(dynamic value) => int.tryParse(value?.toString() ?? '') ?? 0;
 
@@ -73,12 +80,13 @@ class _ReceptiPageState extends State<ReceptiPage> {
 
     try {
       final userId = await _resolveCurrentUserId();
-      final rows = await DbQueries.getReceptiList();
+      final rows = await widget.repository.getReceptiList();
 
       Map<int, bool> missing = {};
       if (userId != null) {
-        missing = await DbQueries.getReceptMissingStatusForUser(userId);
+        missing = await widget.repository.getReceptMissingStatusForUser(userId);
       }
+
 
       if (!mounted) return;
 
@@ -436,11 +444,21 @@ class _ReceptiPageState extends State<ReceptiPage> {
 class ReceptDetaljiPage extends StatefulWidget {
   final int idRecept;
   final int? currentUserId;
+  final Future<Map<String, dynamic>?> Function(int idRecept)? loadReceptDetalji;
+  final Future<List<Map<String, dynamic>>> Function(int idRecept)? loadReceptSastojci;
+  final Future<List<Map<String, dynamic>>> Function({
+  required int idRecept,
+  required int idKorisnik,
+  })? loadMissingSastojci;
+
 
   const ReceptDetaljiPage({
     super.key,
     required this.idRecept,
     required this.currentUserId,
+    this.loadReceptDetalji,
+    this.loadReceptSastojci,
+    this.loadMissingSastojci,
   });
 
   @override
@@ -480,19 +498,25 @@ class _ReceptDetaljiPageState extends State<ReceptDetaljiPage> {
     });
 
     try {
-      final recept = await DbQueries.getReceptDetaljiById(widget.idRecept);
+      final recept = await (widget.loadReceptDetalji?.call(widget.idRecept) ??
+          DbQueries.getReceptDetaljiById(widget.idRecept));
       if (recept == null) {
         throw Exception('Recept nije pronađen.');
       }
 
-      final sastojci = await DbQueries.getReceptSastojciByReceptId(widget.idRecept);
+      final sastojci = await (widget.loadReceptSastojci?.call(widget.idRecept) ??
+          DbQueries.getReceptSastojciByReceptId(widget.idRecept));
 
       List<Map<String, dynamic>> missing = [];
       if (widget.currentUserId != null) {
-        missing = await DbQueries.getMissingSastojciForReceptUser(
+        missing = await (widget.loadMissingSastojci?.call(
           idRecept: widget.idRecept,
           idKorisnik: widget.currentUserId!,
-        );
+        ) ??
+            DbQueries.getMissingSastojciForReceptUser(
+              idRecept: widget.idRecept,
+              idKorisnik: widget.currentUserId!,
+            ));
       }
 
       if (!mounted) return;

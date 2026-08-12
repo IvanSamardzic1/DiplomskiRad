@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dbqueries.dart';
+import 'test_seams.dart';
 
 class TrgovinaPage extends StatefulWidget {
-  const TrgovinaPage({super.key});
+  final AppRepository repository;
+  final SessionStore sessionStore;
+
+  const TrgovinaPage({
+    super.key,
+    AppRepository? repository,
+    SessionStore? sessionStore,
+  })  : repository = repository ?? const DbAppRepository(),
+        sessionStore = sessionStore ?? const SharedPrefsSessionStore();
 
   @override
   State<TrgovinaPage> createState() => _TrgovinaPageState();
 }
+
 
 class _TrgovinaPageState extends State<TrgovinaPage> {
   bool _isLoading = true;
@@ -29,20 +38,17 @@ class _TrgovinaPageState extends State<TrgovinaPage> {
     });
 
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final loggedInEmail =
-      (prefs.getString('loggedInEmail') ?? '').trim().toLowerCase();
+
+      final loggedInEmail = (await widget.sessionStore.getLoggedInEmail() ?? '').trim().toLowerCase();
 
       if (loggedInEmail.isEmpty) {
         throw Exception('Nema prijavljenog korisnika.');
       }
 
-      final userId = await DbQueries.getUserIdByMail(loggedInEmail);
-      if (userId == null) {
-        throw Exception('Korisnik nije pronađen.');
-      }
+      final userId = await widget.repository.getUserIdByMail(loggedInEmail);
+      if (userId == null) { throw Exception('Korisnik nije pronađen.');  }
+      final rows = await widget.repository.getStavkePopisaTrgovineForUser(userId);
 
-      final rows = await DbQueries.getStavkePopisaTrgovineForUser(userId);
 
       if (!mounted) return;
       setState(() {

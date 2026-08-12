@@ -12,6 +12,7 @@ Generira:
 """
 import os
 import re
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -19,6 +20,7 @@ LCOV_PATH = ROOT / "coverage" / "lcov.info"
 OUT_TXT = ROOT / "coverage" / "coverage_summary.txt"
 OUT_HTML_DIR = ROOT / "coverage" / "html"
 OUT_HTML = OUT_HTML_DIR / "index.html"
+MIN_COVERAGE = 60.0
 
 
 def parse_lcov(path: Path):
@@ -177,6 +179,12 @@ def main():
 
     write_txt(rows, total_lines, total_hit, total_pct)
     write_html(rows, total_lines, total_hit, total_pct)
+
+    if total_pct < MIN_COVERAGE:
+        print(
+            f"\nERROR: Pokrivenost je {total_pct:.1f}%, a minimum je {MIN_COVERAGE:.1f}%."
+        )
+        sys.exit(1)
 
 
 if __name__ == "__main__":

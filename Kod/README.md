@@ -18,3 +18,16 @@ odnosu na heuristički pristup. Aplikacija mora omogućiti jednostavno prebaciva
 mobilnog uređaja na drugi mobilni uređaj. Prilikom pisanja koda posebnu pozornost obratiti na pisanje i
 izvršavanje jediničnih testova i pokrivenosti koda s tako napisanim jediničnim testovima. Konačnu
 funkcionalnost cijele aplikacije potrebno je provjeriti korištenjem funkcijskih testova.
+
+## Pokrivenost testovima (coverage)
+
+Pokreni testove s pokrivenosti:
+
+```powershell
+flutter test --coverage
+python coverage/coverage_report.py
+```
+
+Ako je ukupna pokrivenost ispod definiranog minimuma, `coverage_report.py` vraca exit code 1.
+Trenutni cilj: najmanje 60%.
+

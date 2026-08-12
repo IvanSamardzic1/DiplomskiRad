@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dbqueries.dart';
+import 'test_seams.dart';
 
 class ZalihaNamirnicePage extends StatefulWidget {
-  const ZalihaNamirnicePage({super.key});
+  final AppRepository repository;
+  final SessionStore sessionStore;
+
+  const ZalihaNamirnicePage({
+    super.key,
+    AppRepository? repository,
+    SessionStore? sessionStore,
+  })  : repository = repository ?? const DbAppRepository(),
+        sessionStore = sessionStore ?? const SharedPrefsSessionStore();
 
   @override
   State<ZalihaNamirnicePage> createState() => _ZalihaNamirnicePageState();
 }
+
 
 class _ZalihaNamirnicePageState extends State<ZalihaNamirnicePage> {
   bool _isLoading = true;
@@ -28,20 +37,18 @@ class _ZalihaNamirnicePageState extends State<ZalihaNamirnicePage> {
     });
 
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final loggedInEmail =
-      (prefs.getString('loggedInEmail') ?? '').trim().toLowerCase();
+      final loggedInEmail = (await widget.sessionStore.getLoggedInEmail() ?? '').trim().toLowerCase();
 
       if (loggedInEmail.isEmpty) {
         throw Exception('Nema prijavljenog korisnika.');
       }
 
-      final userId = await DbQueries.getUserIdByMail(loggedInEmail);
+      final userId = await widget.repository.getUserIdByMail(loggedInEmail);
       if (userId == null) {
         throw Exception('Korisnik nije pronađen.');
       }
+      final rows = await widget.repository.getZaliheForUser(userId);
 
-      final rows = await DbQueries.getZaliheForUser(userId);
 
       if (!mounted) return;
       setState(() {

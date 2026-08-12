@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'ml_scoring.dart';
 import 'dbqueries.dart';
 import 'heuristika.dart';
+import 'test_seams.dart';
 
 class PlanPrehranePage extends StatefulWidget {
-  const PlanPrehranePage({super.key});
+  final AppRepository repository;
+  final SessionStore sessionStore;
+
+  const PlanPrehranePage({
+    super.key,
+    AppRepository? repository,
+    SessionStore? sessionStore,
+  })  : repository = repository ?? const DbAppRepository(),
+        sessionStore = sessionStore ?? const SharedPrefsSessionStore();
 
   @override
   State<PlanPrehranePage> createState() => _PlanPrehranePageState();
 }
+
 
 class _PlanPrehranePageState extends State<PlanPrehranePage> {
   bool _loading = true;
@@ -278,27 +287,25 @@ class _PlanPrehranePageState extends State<PlanPrehranePage> {
     try {
       setState(() => _loading = true);
 
-      final prefs = await SharedPreferences.getInstance();
-      final email = prefs.getString('email') ??
-          prefs.getString('loggedInEmail') ??
-          prefs.getString('userEmail');
+      final email = await widget.sessionStore.getLoggedInEmail();
 
       if (email == null || email.trim().isEmpty) {
         throw Exception('Nije pronaden prijavljeni korisnik (email).');
       }
 
-      final idKorisnik = await DbQueries.getUserIdByMail(email);
+      final idKorisnik = await widget.repository.getUserIdByMail(email);
       if (idKorisnik == null) {
         throw Exception('Nije pronaden id prijavljenog korisnika.');
       }
 
-      final vrste = await DbQueries.getVrsteObroka();
-      final plan = await DbQueries.getPlanObrokaZaPeriod(
+      final vrste = await widget.repository.getVrsteObroka();
+      final plan = await widget.repository.getPlanObrokaZaPeriod(
         idKorisnik: idKorisnik,
         od: _days.first,
         doDatuma: _days.last,
       );
-      final recepti = await DbQueries.getReceptiList();
+      final recepti = await widget.repository.getReceptiList();
+
 
       if (!mounted) return;
       setState(() {

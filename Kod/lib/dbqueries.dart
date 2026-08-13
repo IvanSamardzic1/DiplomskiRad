@@ -14,6 +14,27 @@ Metode su organizirane po funkcionalnosti (korisnici, zalihe, recepti, itd.).
 class DbQueries {
   static final SqlConnectionService _sql = SqlConnectionService.instance;
 
+  // Test seam: allows unit tests to inject fake SQL query/execute handlers.
+  static Future<List<Map<String, Object?>>> Function(String sql) _queryExecutor = _sql.query;
+  static Future<void> Function(String sql) _executeExecutor = _sql.execute;
+
+  static Future<List<Map<String, Object?>>> _query(String sql) => _queryExecutor(sql);
+
+  static Future<void> _execute(String sql) => _executeExecutor(sql);
+
+  static void setSqlExecutorsForTesting({
+    required Future<List<Map<String, Object?>>> Function(String sql) query,
+    required Future<void> Function(String sql) execute,
+  }) {
+    _queryExecutor = query;
+    _executeExecutor = execute;
+  }
+
+  static void resetSqlExecutorsForTesting() {
+    _queryExecutor = _sql.query;
+    _executeExecutor = _sql.execute;
+  }
+
   // Escapira string za SQL literal (' -> '')
   static String _sqlEscape(String value) => value.replaceAll("'", "''");
 
@@ -27,7 +48,7 @@ class DbQueries {
     final normalizedMail = mail.trim().toLowerCase();
     final safeMail = _sqlEscape(normalizedMail);
 
-    final rows = await _sql.query('''
+    final rows = await _query('''
       SELECT TOP 1 email, lozinkaHash, ime, prezime
       FROM Korisnik
       WHERE LOWER(email) = '$safeMail'
@@ -77,7 +98,7 @@ class DbQueries {
     final safeMail = _sqlEscape(mail.trim().toLowerCase());
     final passwordHash = hashPassword(plainPassword);
 
-    await _sql.execute('''
+    await _execute('''
       INSERT INTO Korisnik (email, lozinkaHash, ime, prezime)
       VALUES ('$safeMail', '$passwordHash', '$safeIme', '$safePrezime')
       ''');
@@ -87,7 +108,7 @@ class DbQueries {
   static Future<void> deleteUserByMail(String mail) async {
     final safeMail = _sqlEscape(mail.trim().toLowerCase());
 
-    await _sql.execute('''
+    await _execute('''
     DELETE FROM Korisnik
     WHERE LOWER(CAST(email AS NVARCHAR(255))) = '$safeMail'
   ''');
@@ -101,7 +122,7 @@ class DbQueries {
     final safeMail = _sqlEscape(mail.trim().toLowerCase());
     final newHash = hashPassword(newPlainPassword);
 
-    await _sql.execute('''
+    await _execute('''
     UPDATE Korisnik
     SET lozinkaHash = '$newHash'
     WHERE LOWER(email) = '$safeMail'
@@ -112,7 +133,7 @@ class DbQueries {
   static Future<int?> getUserIdByMail(String mail) async {
     final safeMail = _sqlEscape(mail.trim().toLowerCase());
 
-    final rows = await _sql.query('''
+    final rows = await _query('''
     SELECT TOP 1 idKorisnik
     FROM Korisnik
     WHERE LOWER(email) = '$safeMail'
@@ -126,7 +147,7 @@ class DbQueries {
 
   // Dohvaćanje svih zaliha za određenog korisnika, uključujući i kategoriju i veličinu.
   static Future<List<Map<String, dynamic>>> getZaliheForUser(int idKorisnik) async {
-    final rows = await _sql.query('''
+    final rows = await _query('''
     SELECT
       z.idZaliha,
       z.idKorisnik,
@@ -152,7 +173,7 @@ class DbQueries {
 
   // Dohvaćanje svih mogućih kategorija sastojaka.
   static Future<List<Map<String, dynamic>>> getKategorije() async {
-    final rows = await _sql.query('''
+    final rows = await _query('''
     SELECT idKategorija, imeKategorije
     FROM Kategorija
     ORDER BY imeKategorije ASC
@@ -163,7 +184,7 @@ class DbQueries {
 
   // Dohvaćanje svih sastojaka unutar određene kategorije, uključujući i veličinu.
   static Future<List<Map<String, dynamic>>> getSastojciByKategorija(int idKategorija) async {
-    final rows = await _sql.query('''
+    final rows = await _query('''
     SELECT
       s.idSastojak,
       s.ime AS sastojakIme,
@@ -198,7 +219,7 @@ class DbQueries {
     final d = datumRoka.day.toString().padLeft(2, '0');
     final safeDatum = '$y-$m-$d';
 
-    await _sql.execute('''
+    await _execute('''
     IF EXISTS (
       SELECT 1
       FROM Zaliha
@@ -227,7 +248,7 @@ class DbQueries {
     required int idKorisnik,
     required int idSastojak,
   }) async {
-    final rows = await _sql.query('''
+    final rows = await _query('''
     SELECT TOP 1
       idZaliha,
       idKorisnik,
@@ -264,7 +285,7 @@ class DbQueries {
     final d = datumRoka.day.toString().padLeft(2, '0');
     final safeDatum = '$y-$m-$d';
 
-    await _sql.execute('''
+    await _execute('''
     UPDATE Zaliha
     SET
       kolicina = $kolicina,
@@ -279,7 +300,7 @@ class DbQueries {
     required int idZaliha,
     required int idKorisnik,
   }) async {
-    await _sql.execute('''
+    await _execute('''
     DELETE FROM Zaliha
     WHERE idZaliha = $idZaliha
       AND idKorisnik = $idKorisnik
@@ -290,7 +311,7 @@ class DbQueries {
   static Future<List<Map<String, dynamic>>> getStavkePopisaTrgovineForUser(
       int idKorisnik,
       ) async {
-    final rows = await _sql.query('''
+    final rows = await _query('''
     SELECT
       st.idStavkaPopisa,
       st.idKorisnik,
@@ -322,7 +343,7 @@ class DbQueries {
       throw Exception('Količina mora biti veća od 0.');
     }
 
-    await _sql.execute('''
+    await _execute('''
     INSERT INTO StavkaPopisaTrgovina (idKorisnik, sastojakId, kolicina)
     VALUES ($idKorisnik, $idSastojak, $kolicina)
   ''');
@@ -334,7 +355,7 @@ class DbQueries {
     required int idKorisnik,
   }) async {
     print("Brisanje StavkaPopisaTrgovina: idStavkaPopisa=$idStavkaPopisa, idKorisnik=$idKorisnik");
-    await _sql.execute('''
+    await _execute('''
     DELETE FROM StavkaPopisaTrgovina
     WHERE idStavkaPopisa = $idStavkaPopisa
       AND idKorisnik = $idKorisnik
@@ -352,7 +373,7 @@ class DbQueries {
       throw Exception('Količina mora biti veća od 0.');
     }
     print("Update kolicine za StavkaPopisaTrgovina: idStavkaPopisa=$idStavkaPopisa, idKorisnik=$idKorisnik, novaKolicina=$novaKolicina");
-    await _sql.execute('''
+    await _execute('''
     UPDATE StavkaPopisaTrgovina
     SET kolicina = $novaKolicina
     WHERE idStavkaPopisa = $idStavkaPopisa
@@ -378,7 +399,7 @@ class DbQueries {
     final safeDatum = '$y-$m-$d';
 
     print("Prebacivanje iz StavkaPopisaTrgovina u Zaliha: idKorisnik=$idKorisnik, idSastojak=$idSastojak, kupljenaKolicina=$kupljenaKolicina, datumRoka=$safeDatum");
-    await _sql.execute('''
+    await _execute('''
     BEGIN TRY
       BEGIN TRANSACTION;
 
@@ -422,7 +443,7 @@ class DbQueries {
 
   // Dohvaćanje svih recepata s imenom autora za prikaz u listi recepata.
   static Future<List<Map<String, dynamic>>> getReceptiList() async {
-    final rows = await _sql.query('''
+    final rows = await _query('''
     SELECT
       r.idRecept,
       r.naziv,
@@ -479,7 +500,7 @@ class DbQueries {
     ''');
     }
 
-    final rows = await _sql.query('''
+    final rows = await _query('''
     BEGIN TRY
       BEGIN TRANSACTION;
 
@@ -552,7 +573,7 @@ class DbQueries {
     ''');
     }
 
-    await _sql.execute('''
+    await _execute('''
     BEGIN TRY
       BEGIN TRANSACTION;
 
@@ -588,7 +609,7 @@ class DbQueries {
     required int idRecept,
     required int autorKorisnikId,
   }) async {
-    await _sql.execute('''
+    await _execute('''
     BEGIN TRY
       BEGIN TRANSACTION;
 
@@ -621,7 +642,7 @@ class DbQueries {
 
   // Dohvaćanje detalja recepta po ID, uključujući ime autora.
   static Future<Map<String, dynamic>?> getReceptDetaljiById(int idRecept) async {
-    final rows = await _sql.query('''
+    final rows = await _query('''
     SELECT TOP 1
       r.idRecept,
       r.naziv,
@@ -644,7 +665,7 @@ class DbQueries {
 
   // Dohvaćanje svih sastojaka s kategorijom i veličinom za prikaz u dropdownu pri dodavanju sastojaka u recept.
   static Future<List<Map<String, dynamic>>> getAllSastojciForRecipeDropdown() async {
-    final rows = await _sql.query('''
+    final rows = await _query('''
     SELECT
       s.idSastojak,
       s.ime AS sastojakIme,
@@ -666,7 +687,7 @@ class DbQueries {
   static Future<List<Map<String, dynamic>>> getReceptSastojciByReceptId(
       int idRecept,
       ) async {
-    final rows = await _sql.query('''
+    final rows = await _query('''
     SELECT
       rs.idReceptSastojak,
       rs.idRecept,
@@ -686,7 +707,7 @@ class DbQueries {
 
   // Dohvaćanje informacija o tome koji recepti imaju nedostajuće sastojke za određenog korisnika, vraća mapu idRecept -> bool (true ako nedostaje, false ako ne nedostaje).
   static Future<Map<int, bool>> getReceptMissingStatusForUser(int idKorisnik) async {
-    final rows = await _sql.query('''
+    final rows = await _query('''
     SELECT
       rs.idRecept,
       MAX(CASE
@@ -716,7 +737,7 @@ class DbQueries {
     required int idRecept,
     required int idKorisnik,
   }) async {
-    final rows = await _sql.query('''
+    final rows = await _query('''
     SELECT
       rs.idSastojak,
       s.ime AS sastojakIme,
@@ -748,7 +769,7 @@ class DbQueries {
 
   // Vraca tipove obroka iz tablice VrstaObroka (dorucak, rucak, vecera)
   static Future<List<Map<String, dynamic>>> getVrsteObroka() async {
-    final rows = await _sql.query('''
+    final rows = await _query('''
     SELECT idVrstaObroka, ime
     FROM VrstaObroka
     ORDER BY idVrstaObroka ASC
@@ -767,7 +788,7 @@ class DbQueries {
     final odSql = _dateOnlySql(od);
     final doSql = _dateOnlySql(doDatuma);
 
-    final rows = await _sql.query('''
+    final rows = await _query('''
       SELECT
         p.idPlanObroka,
         p.idKorisnik,
@@ -800,7 +821,7 @@ class DbQueries {
   }) async {
     final datumSql = _dateOnlySql(datumObrok);
 
-    await _sql.execute('''
+    await _execute('''
       IF EXISTS (
         SELECT 1
         FROM PlanObroka
@@ -832,7 +853,7 @@ class DbQueries {
     required int idPlanObroka,
     required int idKorisnik,
   }) async {
-    await _sql.execute('''
+    await _execute('''
       BEGIN TRY
         BEGIN TRANSACTION;
 
@@ -902,7 +923,7 @@ class DbQueries {
     required int idPlanObroka,
     required int idKorisnik,
   }) async {
-    await _sql.execute('''
+    await _execute('''
     DELETE FROM PlanObroka
     WHERE idPlanObroka = $idPlanObroka
       AND idKorisnik = $idKorisnik
@@ -913,7 +934,7 @@ class DbQueries {
     required int idKorisnik,
     required int tipObrokaId,
   }) async {
-    final rows = await _sql.query('''
+    final rows = await _query('''
     SELECT
       r.idRecept,
       $tipObrokaId AS tipObroka,
@@ -951,7 +972,7 @@ class DbQueries {
   static Future<List<Map<String, dynamic>>> getHeuristicCandidatesForUser({
     required int idKorisnik,
   }) async {
-    final rows = await _sql.query('''
+    final rows = await _query('''
     SELECT
       r.idRecept AS idRecept,
       ISNULL(r.vrijemePripreme, 0) AS vrijemePripremeMin,

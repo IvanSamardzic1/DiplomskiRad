@@ -362,6 +362,243 @@ void main() {
   });
 
   group('ZalihaNamirnicePage extra branches', () {
+
+    testWidgets('retry nakon greske ponovno ucitava zalihe', (tester) async {
+      final repo = _FakeRepo()
+        ..userId = 11
+        ..zaliheError = Exception('privremena greska');
+
+      await tester.pumpWidget(
+        _host(
+          ZalihaNamirnicePage(
+            repository: repo,
+            sessionStore: _FakeSessionStore('x@y.com'),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('privremena greska'), findsOneWidget);
+      expect(find.text('Pokušaj ponovno'), findsOneWidget);
+
+      repo
+        ..zaliheError = null
+        ..zalihe = [
+          {
+            'idZaliha': 22,
+            'sastojakIme': 'Meso',
+            'kolicina': 4,
+            'minKolicina': 1,
+            'kategorijaIme': 'Proteini',
+            'oznakaVelicine': 'g',
+            'datum': DateTime.now().add(const Duration(days: 7)).toIso8601String(),
+          }
+        ];
+
+      await tester.tap(find.text('Pokušaj ponovno'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Meso'), findsOneWidget);
+    });
+
+    testWidgets('invalidan idZaliha ne otvara dialog za brisanje', (tester) async {
+      final repo = _FakeRepo()
+        ..userId = 11
+        ..zalihe = [
+          {
+            'idZaliha': 0, // early return grana
+            'sastojakIme': 'Paprika',
+            'kolicina': 2,
+            'minKolicina': 1,
+            'kategorijaIme': 'Povrce',
+            'oznakaVelicine': 'kom',
+            'datum': DateTime.now().add(const Duration(days: 4)).toIso8601String(),
+          }
+        ];
+
+      await tester.pumpWidget(
+        _host(
+          ZalihaNamirnicePage(
+            repository: repo,
+            sessionStore: _FakeSessionStore('x@y.com'),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('Obriši'));
+      await tester.pump();
+
+      expect(find.text('Potvrda brisanja'), findsNothing);
+    });
+
+    testWidgets('neparsabilan datum prikazuje se kao raw string', (tester) async {
+      final repo = _FakeRepo()
+        ..userId = 11
+        ..zalihe = [
+          {
+            'idZaliha': 30,
+            'sastojakIme': 'Brasno',
+            'kolicina': 5,
+            'minKolicina': 1,
+            'kategorijaIme': 'Ugljikohidrati',
+            'oznakaVelicine': 'g',
+            'datum': 'nije-datum',
+          }
+        ];
+
+      await tester.pumpWidget(
+        _host(
+          ZalihaNamirnicePage(
+            repository: repo,
+            sessionStore: _FakeSessionStore('x@y.com'),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('Rok trajanja: nije-datum'), findsOneWidget);
+      expect(find.text('Rok je istekao'), findsNothing);
+      expect(find.text('Rok trajanja uskoro ističe'), findsNothing);
+    });
+
+    testWidgets('null datum prikazuje crtu', (tester) async {
+      final repo = _FakeRepo()
+        ..userId = 11
+        ..zalihe = [
+          {
+            'idZaliha': 31,
+            'sastojakIme': 'Sol',
+            'kolicina': 1,
+            'minKolicina': 0,
+            'kategorijaIme': 'Zacini',
+            'oznakaVelicine': 'g',
+            'datum': null,
+          }
+        ];
+
+      await tester.pumpWidget(
+        _host(
+          ZalihaNamirnicePage(
+            repository: repo,
+            sessionStore: _FakeSessionStore('x@y.com'),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('Rok trajanja: -'), findsOneWidget);
+    });
+
+    testWidgets('kolicina jednaka minimalnoj prikazuje upozorenje i warning ikonu', (tester) async {
+      final repo = _FakeRepo()
+        ..userId = 11
+        ..zalihe = [
+          {
+            'idZaliha': 32,
+            'sastojakIme': 'Jaja',
+            'kolicina': 2,
+            'minKolicina': 2, // <= min grana
+            'kategorijaIme': 'Proteini',
+            'oznakaVelicine': 'kom',
+            'datum': DateTime.now().add(const Duration(days: 10)).toIso8601String(),
+          }
+        ];
+
+      await tester.pumpWidget(
+        _host(
+          ZalihaNamirnicePage(
+            repository: repo,
+            sessionStore: _FakeSessionStore('x@y.com'),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
+      expect(find.textContaining('Upozorenje: ispod minimalne količine (2)'), findsOneWidget);
+    });
+
+    testWidgets('Uredi dialog validacija: kolicina mora biti > 0', (tester) async {
+      final repo = _FakeRepo()
+        ..userId = 11
+        ..zalihe = [
+          {
+            'idZaliha': 40,
+            'sastojakIme': 'Mlijeko',
+            'kolicina': 3,
+            'minKolicina': 1,
+            'kategorijaIme': 'Mlijecni',
+            'oznakaVelicine': 'L',
+            'datum': DateTime.now().add(const Duration(days: 6)).toIso8601String(),
+          }
+        ];
+
+      await tester.pumpWidget(
+        _host(
+          ZalihaNamirnicePage(
+            repository: repo,
+            sessionStore: _FakeSessionStore('x@y.com'),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('Uredi'));
+      await tester.pumpAndSettle();
+
+      final fields = find.byType(TextFormField);
+      await tester.enterText(fields.at(0), '0'); // Količina
+      await tester.tap(find.text('Spremi'));
+      await tester.pump();
+
+      expect(find.text('Mora biti više od 0'), findsOneWidget);
+    });
+
+    testWidgets('Uredi dialog validacija: minimalna kolicina ne moze biti negativna', (tester) async {
+      final repo = _FakeRepo()
+        ..userId = 11
+        ..zalihe = [
+          {
+            'idZaliha': 41,
+            'sastojakIme': 'Jogurt',
+            'kolicina': 3,
+            'minKolicina': 1,
+            'kategorijaIme': 'Mlijecni',
+            'oznakaVelicine': 'kom',
+            'datum': DateTime.now().add(const Duration(days: 6)).toIso8601String(),
+          }
+        ];
+
+      await tester.pumpWidget(
+        _host(
+          ZalihaNamirnicePage(
+            repository: repo,
+            sessionStore: _FakeSessionStore('x@y.com'),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('Uredi'));
+      await tester.pumpAndSettle();
+
+      final fields = find.byType(TextFormField);
+      await tester.enterText(fields.at(0), '3');   // Količina validna
+      await tester.enterText(fields.at(1), '-1');  // Minimalna količina invalidna
+      await tester.tap(find.text('Spremi'));
+      await tester.pump();
+
+      expect(find.text('Ne može biti negativno'), findsOneWidget);
+    });
+
     testWidgets('validan item otvara delete confirm i Odustani ga zatvara', (tester) async {
       final repo = _FakeRepo()
         ..userId = 11

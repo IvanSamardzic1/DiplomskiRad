@@ -4,6 +4,7 @@
 
 
 \usepackage{blindtext}
+\usepackage{float}
 
 
 %--- PODACI O RADU / THESIS INFORMATION ----------------------------------------
@@ -174,6 +175,196 @@ Nefunkcionalni zahtjevi su oni zahtjevi koji opisuju kako sustav treba raditi
 \section{Arhitektura aplikacije}
 
 \section{Baza podataka}
+Baza podataka je važan i nužan element za ovu Android aplikaciju. U nju se spremaju i iz nje se dohvaćaju svi podatci koje koristimo u aplikaciji. U ovom projektu korištena je Microsoft SQL Server baza podataka, a alat za upravljanje tom bazom koji je korišten je SQL Server Management Studio 19. Odabrana je jer podržava sve značajke koje su potrebne ovoj aplikaciji.
+\subsubsection{Model baze podataka}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.90\linewidth]{dodatci/baza.png} 
+  \caption{Baza podataka}
+  \label{slk:prvaslika}
+\end{figure}
+
+Na gornjoj slici vidimo model baze podataka. Baza se sastoji od 10 tablica, a to su VrstaObroka, PlanObroka, Recept, ReceptSastojak, Korisnik, Zaliha, Sastojak, Velicina, Kategorija i StavkaPopisaTrgovina. Svaka tablica ima svoj privatni ključ i dodatne atribute koji ju opisuju. Na slici se vide i veze između pojedinih tablica. 
+\\
+\\
+\textbf{Pojedinačni opis entiteta}
+
+Tablica \textbf{Korisnik} predstavlja korisnika naše aplikacije. Svaki korisnik ima svoj identifikator, odnosno privatni ključ te email i hashiranu lozinku za prijavu u aplikaciju, te ime i prezime. 
+
+
+\begin{table}[htb]
+\label{tbl:Korisnik}
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{llr} \hline
+Naziv & Tip podatka & Ograničenja\\ \hline
+idKorisnik & int & Primarni ključ, povećava se sam za 1 \\
+email & varchar(50) & Not null\\
+lozinkaHash & varchar(64) & Not null\\
+ime & varchar(50) & Not null\\
+prezime & varchar(50) & Not null\\
+\end{tabular}
+\caption{Korisnik}
+\end{table}
+
+Tablica \textbf{Zaliha} je tablica koja označava sve zalihe u našoj aplikaciji. Sastoji se od idZaliha koji je primarni ključ ove tablice, te je tu i idKorisnik pomoću kojeg se spaja na tablicu Korisnik i označava pripadnost zalihe određenom korisniku. Sljedeći atribut je idSastojak pomoću kojeg se spaja na tablicu Sastojak i označava koji sastojak je ta zaliha. Tu su i atributi kolicina(količina sastojka), datum(rok trajanja) i min(minimalna količina zalihe nakon koje dolazi upozorenje). 
+
+
+\begin{table}[htb]
+\label{tbl:Zaliha}
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{llr} \hline
+Naziv & Tip podatka & Ograničenja\\ \hline
+idZaliha & int & Primarni ključ, povećava se sam za 1 \\
+idKorisnik & int & Not null\\
+idSastojak & int & Not null\\
+kolicina & int & Not null\\
+datum & date & Not null\\
+min & int & Not null\\
+\end{tabular}
+\caption{Zaliha}
+\end{table}
+
+Tablica \textbf{Sastojak} označava sve sastojke koji su dostupni u bazi podataka. Sastoji se od primarnog ključa idSastojak, imena sastojka te od stranih ključeva idKategorija i idVelicina pomoću kojih se spaja na tablice Velicina i Kategorija. 
+
+
+\begin{table}[H]
+\label{tbl:Sastojak}
+\centering
+
+\begin{tabular}{llr} \hline
+Naziv & Tip podatka & Ograničenja\\ \hline
+idSastojak & int & Primarni ključ, povećava se sam za 1 \\
+ime & varchar(50) & Not null\\
+idKategorija & int & Not null\\
+idVelicina & int & Not null\\
+\end{tabular}
+\caption{Sastojak}
+\end{table}
+
+
+Tablica \textbf{Velicina} je tablica koja opisuje oznaku veličine u kojima kupujemo i dobavljamo određene namirnice namirnice. To može biti komad, mililitra, kilogram i slično. Sastoji se od idVelicine koji je primarni ključ, oznakaVelicine, odnosno kom, kg, ml i slično, te od nazivVelicine koji je puni naziv oznake(komad, kilogram i slično).
+
+
+\begin{table}[H]
+\label{tbl:Velicina}
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{llr} \hline
+Naziv & Tip podatka & Ograničenja\\ \hline
+idVelicina & int & Primarni ključ, povećava se sam za 1 \\
+oznakaVelicine & varchar(50) & Not null\\
+nazivVelicine & varchar(50) & Not null\\
+\end{tabular}
+\caption{Velicina}
+\end{table}
+
+Tablica \textbf{Kategorija} je tablica koja opisuje kategoriju određene namirnice. Sastoji se od idKategorija koji je primarni ključ i od atributa imeKategorije što može biti meso, tjestenina, voće i slično.
+
+\begin{table}[htb]
+\label{tbl:Kategorija}
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{llr} \hline
+Naziv & Tip podatka & Ograničenja\\ \hline
+idKategorija & int & Primarni ključ, povećava se sam za 1 \\
+imeKategorije & varchar(50) & Not null\\
+\end{tabular}
+\caption{Kategorija}
+\end{table}
+
+Tablica \textbf{StavkaPopisaTrgovina} je tablica koja čuva podatke o sastojcima koji trebaju biti kupljeni u trgovini. Sastoji se od primarnog ključa idStavkaPopisa, stranog ključa idKorisnik pomoću kojeg označavamo koji korisnik je dodao namirnicu na popis, stranog ključa sastojakId pomoću kojeg određujemo koja namirnica treba biti kupljena i atributa kolicina koji određuje kolika količina te namirnice je potrebna.
+
+
+\begin{table}[htb]
+\label{tbl:PopisTrgovina}
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{llr} \hline
+Naziv & Tip podatka & Ograničenja\\ \hline
+idStavkaPopisa & int & Primarni ključ, povećava se sam za 1 \\
+idKorisnik & int & Not null\\
+sastojakId & int & Not null\\
+kolicina & int & Not null\\
+\end{tabular}
+\caption{StavkaPopisaTrgovina}
+\end{table}
+
+Tablica \textbf{Recept} označava recepte koji se prikazuju u aplikaciji. Sama tablica sastoji se od idRecept koji je primarni ključ, naziv koji označava naziv recepta, opis koji označava opis recepta, vrijemePripreme i autorKorisnikId koji označava koji korisnik je unio taj recept u aplikaciju. Naime, onaj koji unese ima ovlasti i za brisanje i uređivanje recepta kasnije. AutorKorisnikId je ujedno i strani ključ kojim se vežemo na tablicu Korisnik.
+
+\begin{table}[H]
+\label{tbl:Recept}
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{llr} \hline
+Naziv & Tip podatka & Ograničenja\\ \hline
+idRecept & int & Primarni ključ, povećava se sam za 1 \\
+naziv & varchar(50) & Not null\\
+opis & nvarchar(MAX) & Not null\\
+vrijemePripreme & nvarchar(50) & Not null\\
+autorKorisnikId & int & Not null\\
+\end{tabular}
+\caption{Recept}
+\end{table}
+
+Tablica \textbf{ReceptSastojak} je tablica koja prikazuje sastojke koji su potrebni za pojedini recept. Primarni ključ je tu idReceptSastojak, uz njega su tu atributi idRecept pomoću kojeg se spajamo na tablicu Recept, idSastojak pomoću kojeg se spajamo na tablicu Sastojak i potrebnaKolicina koja označava količinu određenog sastojka u nekom receptu. Svaki redak u ovoj tablici povezuje određeni recept i njegov sastojak.
+
+\begin{table}[H]
+\label{tbl:ReceptSastojak}
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{llr} \hline
+Naziv & Tip podatka & Ograničenja\\ \hline
+idReceptSastojak & int & Primarni ključ, povećava se sam za 1 \\
+idRecept & int & Not null\\
+idSastojak & int & Not null\\
+potrebnaKolicina & int & Not null\\
+\end{tabular}
+\caption{ReceptSastojak}
+\end{table}
+
+Tablica \textbf{PlanObroka} služi kako bi korisnik mogao planirati svoje buduće obroke. Sastoji se od idPlanObroka, koji je primarni ključ, onda idKorisnik pomoću kojeg se povezujemo na tablicu Korisnik i pomoću kojeg označavamo koji korisnik je dodao nešto u svoj plan obroka, zatim idRecept pomoću kojeg se spajamo na tablicu Recept te koji govori koji recept je odabran za neki obrok. Uz to, tu je i datumObrok, tipObroka koji se spaja na tablicu vrstaObroka i dva dodatna atributa izvrsen i odabran koji kasnije služe pri predlaganju obroka. 
+
+\begin{table}[H]
+\label{tbl:PlanObroka}
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{llr} \hline
+Naziv & Tip podatka & Ograničenja\\ \hline
+idPlanObroka & int & Primarni ključ, povećava se sam za 1 \\
+idKorisnik & int & Not null\\
+idRecept & int & Not null\\
+datumObrok & date & Not null\\
+tipObroka & int & Not null\\
+izvrsen & int & Not null\\
+odabran & int & Not null\\
+\end{tabular}
+\caption{PlanObroka}
+\end{table}
+
+Posljednja tablica je tablica \textbf{VrstaObroka} koja služi samo za definiranje vrsta obroka. Sastoji se od idVrstaObroka koji je primarni ključ i ime koje može biti doručak, ručak ili večera.
+
+\begin{table}[H]
+\label{tbl:VrstaObroka}
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{llr} \hline
+Naziv & Tip podatka & Ograničenja\\ \hline
+idVrstaObroka & int & Primarni ključ, povećava se sam za 1 \\
+ime & nvarchar(50) & Not null\\
+\end{tabular}
+\caption{VrstaObroka}
+\end{table}
+
+
+
+
+
+
+
+
 
 \section{Funkcionalnosti aplikacije}
 \subsection{Prijava i registracija korisnika}

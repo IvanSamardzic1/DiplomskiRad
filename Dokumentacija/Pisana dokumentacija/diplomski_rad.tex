@@ -5,6 +5,7 @@
 
 \usepackage{blindtext}
 \usepackage{float}
+\usepackage{subcaption}
 
 
 %--- PODACI O RADU / THESIS INFORMATION ----------------------------------------
@@ -173,6 +174,9 @@ Nefunkcionalni zahtjevi su oni zahtjevi koji opisuju kako sustav treba raditi
 \end{itemize}
 
 \section{Arhitektura aplikacije}
+Prema strukturi projekta, aplikacija je organizirana kao višeslojna klijentska arhitektura. Prezentacijski sloj čine svi dokumenti iz mape lib/(zalihe, trgovina, recepti i sl.), dok je centralna navigacija i ulazni tok definiran u main.dart. Stanje prijave, odnosno sesije je lokalno pohranjeno preko SharedPreferences, što olakšava pokretanje aplikacije. Što se tiče podatkovnog sloja, on je odvojen u sql\_connection.dart i dbqueries.dart. U tim datotekama se održava konekcija prema SQL Server bazi i izvršavaju sve CRUD i transakcijske naredbe. Poslovna logika je izdvojena u posebne module, npr heuristika u heuristika.dart a ML bodovanje u ml\_scoring.dart. Sama arhitektura je dodatno prilagođena testiranju kroz apstrakcije u test\_seams.dart te kroz odvojene testove. 
+
+Ispod se nalazi Struktura koda i dijagram klasa za ovaj projekt.
 
 \section{Baza podataka}
 Baza podataka je važan i nužan element za ovu Android aplikaciju. U nju se spremaju i iz nje se dohvaćaju svi podatci koje koristimo u aplikaciji. U ovom projektu korištena je Microsoft SQL Server baza podataka, a alat za upravljanje tom bazom koji je korišten je SQL Server Management Studio 19. Odabrana je jer podržava sve značajke koje su potrebne ovoj aplikaciji.
@@ -367,7 +371,44 @@ ime & nvarchar(50) & Not null\\
 
 
 \section{Funkcionalnosti aplikacije}
+Funkcionalnosti aplikacije su napravljene tako da pokriju sve funkcionalne i nefunkcionalne zahtjeve. Cilj je bio da korištenje aplikacije zaista bude intuitivna i jednostavna svim generacijama i da ju svatko može koristiti bez posebnih uputa
+\subsection{Početni zaslon}
+Početni zaslon implementiran je tako da pri pokretanju prvo provjerava stanje korisničke sesije, odnosno ključ koji imam u SharedPreferences isLoggedIn. Taj ključ vraća boolean vrijednost koja nam govori je li korisnik već bio prijavljen ili nije. Dok se to učitava, pokazuje se indikator učitavanja kako bi dobili jasan prijelaz, a ne prazan ekran. Ako je korisnik već bio prijavljen, otvara se glavni zaslon s porukom dobrodošlice, a ako nije otvara se zaslon za prijavu, odnosno registraciju korisnika. Na dnu početnog zaslona, ako je korisnik prijavljen, vidi se navigacijska traka koja služi kao vodič kroz aplikaciju, gdje korisnik može "preskakati" sa zaslona na zaslon. Time početni zaslon ima dvostruku ulogu: ulaznu kontrolu pristupa i usmjeravanje korisnika.
+
+\begin{figure}[H]
+    \centering
+
+    \begin{subfigure}[b]{0.42\textwidth}
+        \centering
+        \includegraphics[height=0.55\textheight,keepaspectratio]{dodatci/pocetna_prijavljen.png}
+        \caption{Prijavljen korisnik}
+        \label{slk:pocetna_prijavljen}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.42\textwidth}
+        \centering
+        \includegraphics[height=0.55\textheight,keepaspectratio]{dodatci/pocetna_odjavljen.png}
+        \caption{Odjavljen korisnik}
+        \label{slk:pocetna_odjavljen}
+    \end{subfigure}
+
+    \caption{Početni zaslon aplikacije}
+    \label{slk:pocetna}
+\end{figure}
+
 \subsection{Prijava i registracija korisnika}
+Na slici 2.2. (b) možemo vidjeti formu za prijavu, odnosno registraciju korisnika. S tim je objedinjena autentifikacija korisnika. Vidimo dva taba, jedan je za prijavu, drugi za registraciju. Jedina razlika je što kod registracije moramo dodati i ime, prezime i potvrditi lozinku. Pri unosu podataka provode se osnovne validacije(obavezno polje, format e-maila, složenost lozinke i potvrda lozinke), čime se smanjuje broj neispravnih zahtjeva prema bazi.
+Pri prijavi, najprije se provjerava postoji li korisnik te ako postoji ispravnost lozinke, a zatim se nakon uspješne prijave stanje sesije sprema u SharedPreferences(isLoggedIn i loggedInEmail) i korisnik se preusmjeri na glavni zaslon. Kod registracije se provjerava još i jedinstvenost e-mail adrese, te ako se uspješno registrira, automatski je i prijavljen i nastavlja rad bez dodatnog koraka prijave. 
+\subsection{Profil korisnika}
+U gornjem desnom kutu početnog zaslona vidimo malu ikonu "osobe". Klikom na taj gumb dolazimo na profil prijavljenog korisnika. On služi za prikaz osnovnih korisničkih podataka i upravljanja računom. Podaci se dohvaćaju iz baze na temelju prijavljenog e-maila pohranjenog u lokalnoj sesiji, a korisniku su dostupne akcije odjave i brisanja računa(uz eksplicitnu potvrdu). Odjava brište podatke sesije i vraća korisnika na početni autentikacijski tok, dok brisanje računa uklanja korisnički zapis iz baze te također resetira sesiju. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=0.45\textheight,keepaspectratio]{dodatci/profil.png}
+    \caption{Zaslon - profil}
+    \label{slk:profil}
+\end{figure}
+
 \subsection{Zalihe namirnica}
 \subsection{Popis za trgovinu}
 \subsection{Upravljanje receptima}

@@ -29,7 +29,7 @@ class HomePage extends StatelessWidget {
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
                     'Dobrodošli u aplikaciju za praćenje namirnica! U ovoj aplikaciji možete '
-                        'pratiti namirnice koje imate kod kuće, planirati obroke za naredni tjedan i praviti popis za kupovinu',
+                        'pratiti namirnice koje imate kod kuće, planirati obroke i praviti popis za kupovinu',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,

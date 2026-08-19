@@ -410,8 +410,102 @@ U gornjem desnom kutu početnog zaslona vidimo malu ikonu "osobe". Klikom na taj
 \end{figure}
 
 \subsection{Zalihe namirnica}
+
+Na početnom zaslonu na dnu vidimo ikonicu "kutije" koja označava pohranu, odnosno zalihe namirnica. Klikom na taj gumb otvara se zaslon zadužen za upravljanje zalihama namirnicama. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=0.45\textheight,keepaspectratio]{dodatci/zalihe_norm.png}
+    \caption{Zaslon - zalihe namirnica}
+    \label{slk:zalihe}
+\end{figure}
+
+Na slici vidimo kako izgleda taj ekran. Na zaslonu korisnik vidi sve svoje trenutno dostupne namirnice, s količinom, jedinicom mjere, kategorijom i rokom trajanja. Korisnik uz svaku stavku ima i ikonu za uređivanje količine, datuma roka ili minimalne količine, te ikonu za brisanje određene namirnice, pri čemu mora dodatno eksplicitno potvrditi brisanje. Na dnu stranice nalazi se gumb za dodavanje, čime se otvara forma za dodavanje namirnice. Korisnik pri dodavanju prvo iz padajuće liste bira kategoriju, zatim odabire koju namirnicu želi dodati, te unosi količinu, minimalnu količinu (količina nakon koje mu aplikacija javlja da treba kupiti dodatnu količinu) te datum roka trajanja. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=0.3\textheight,keepaspectratio]{dodatci/zalihe_dodavanje.png}
+    \caption{Forma za dodavanje namirnice}
+    \label{slk:dodajzalihe}
+\end{figure}
+
+Kod dodavanja se podaci vežu na prijavljenog korisnika te se dohvaćaju kategorije i sastojci iz baze, a za već postojeću namirnicu radi se ažuriranje, odnosno uvećavanje postojeće zalihe umjesto dupliranja zapisa. Zaslon je povezan s bazom kroz CRUD operacije i osvježavanje podataka u stvarnom vremenu nakon svake promjene
+
+Još jedna dodatna pogodnost i funkcionalnost je to što sustav automatski označava stavke koje su ispod minimalne količine te dodatno upozorava kad je rok istekao ili uskoro istječe, čime se olakšava planiranje potrošnje i smanjuje bacanje hrane. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=0.3\textheight,keepaspectratio]{dodatci/zalihe_validacija.png}
+    \caption{Dodatne funkcionalnosti}
+    \label{slk:valid}
+\end{figure}
+
+
 \subsection{Popis za trgovinu}
+Sljedeći zaslon na redu je popis za trgovinu, a njegova ikonica je treća na navigacijskoj traci. Popis za trgovinu služi za planiranje namirnica koje korisniku nedostaju te prikazuje stavke s nazivom sastojka, kategorijom i potrebnom količinom. Svaku stavku na popisu moguće je urediti(promjena količine) ili obrisati, uz potvrdu akcije i osvježavanje liste nakon promjene. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=0.45\textheight,keepaspectratio]{dodatci/popis_trgovina.png}
+    \caption{Popis za trgovinu}
+    \label{slk:popis}
+\end{figure}
+
+Na samom dnu zaslona opet imamo gumb za dodavanje namirnica. Korisnik vrlo lako može dodati novu stavku na popis za trgovinu jer koristimo obrazac s padajućom listom i time vodimo korisnika do odabira kategorije i do odabira sastojka, čime se smanjuje mogućnost pogrešnog unosa i osigurana konzistentnost naziva namirnica u aplikaciji. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=0.3\textheight,keepaspectratio]{dodatci/popis_dodavanje.png}
+    \caption{Forma za dodavanje namirnice na popis}
+    \label{slk:dodajpopis}
+\end{figure}
+
+Dodatna, posebna funkcionalnost je označavanje stavke kao kupljene. Kad korisnik kupi namirnicu, označi je "kupljenom" na zeleni gumb pokraj imena na popisu za trgovinu. Zatim unese rok trajanja, a aplikacija zatim premješta kupljenu količinu u tablicu zaliha i briše stavku iz popisa trgovine. Time se povezuje module popisa za trgovinu i zaliha namirnica u jedan tok, bez da korisnik mora ponovno unositi kupljene namirnice u popis za namirnice. Za to sve se koriste CRUD operacije, uz validacije (količina > 0) i time se čuva stabilnost sustava
+
+
+\begin{figure}[H]
+    \centering
+
+    \begin{subfigure}[c]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{dodatci/element_trgovina.png}
+        \caption{Element popisa sa zelenim gumbom za potvrdu kupnje}
+        \label{slk:element_trgovina}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[c]{0.38\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{dodatci/potvrda_kupnje.png}
+        \caption{Potvrda kupnje}
+        \label{slk:potvrda_kupnje}
+    \end{subfigure}
+
+    \caption{Element popisa i potvrda kupnje}
+    \label{slk:element_i_potvrda_kupnje}
+\end{figure}
+
+
 \subsection{Upravljanje receptima}
+Treća ikona po redu u navigavijskoj traci vodi nas na zaslon upravljanja receptima gdje korisnik ima pregled svih recepata u sustavu. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=0.40\textheight,keepaspectratio]{dodatci/recepti.png}
+    \caption{Zaslon - recepti}
+    \label{slk:recepti}
+\end{figure}
+Na slici vidimo popis recepata koji su trenutno u bazi podataka. Svaka stavka sadrži osnovne informacije o autoru, a recepti za koje korisniku nedostaju sastojci su istaknuti crvenom bojom, čime se odmah signalizira njihova trenutna neizvedivost. Klikom na recept, korisnik otvara detalje svakog recepta, gdje može vidjeti opis, vrijeme pripreme i kompletan popis sastojaka s potrebnim količinama.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=0.20\textheight,keepaspectratio]{dodatci/detalji_recept.png}
+    \caption{Zaslon - detalji recepta}
+    \label{slk:detalji_recepta}
+\end{figure}
+
+
+
+
 \subsection{Planiranje obroka}
 \subsection{Strojno učenje i heuristika}
 \subsection{Jedinični i funkcionalni testovi}

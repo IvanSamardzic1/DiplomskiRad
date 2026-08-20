@@ -503,11 +503,98 @@ Na slici vidimo popis recepata koji su trenutno u bazi podataka. Svaka stavka sa
     \label{slk:detalji_recepta}
 \end{figure}
 
+Kao što možemo vidjeti na slici 2.10., na jednoj stavci vidimo da se nalaze gumbi za brisanje i uređivanje. Oni se pojavljuju samo na receptima koje je dodao korisnik koji je trenutno prijavljen. Na slici vidimo da je autor recepta korisnik Ivan, te možemo zaključiti da je on prijavljeni korisnik. On može svoj recept brisati i uređivati, dok ostale samo može pregledati. Svaki korisnik može dodati novi recept. Pri dodavanju i kod ažuriranja koristi se forma s validacijama (obavezan naziv, vrijeme pripreme > 0, barem jedan sastojak, količina sastojka > 0), čime osiguravamo kvalitetu podataka prije spremanja. 
+
+\begin{figure}[H]
+    \centering
+
+    \begin{subfigure}[t]{0.45\textwidth}
+        \centering
+        \includegraphics[height=0.35\textheight,keepaspectratio]{dodatci/dodavanje_recepta.png}
+        \caption{Zaslon za dodavanje recepta}
+        \label{slk:dodavanje_recepta}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.45\textwidth}
+        \centering
+        \includegraphics[height=0.35\textheight,keepaspectratio]{dodatci/uredivanje_recepta.png}
+        \caption{Zaslon za uređivanje recepta}
+        \label{slk:uredivanje_recepta}
+    \end{subfigure}
+
+    \caption{Dodavanje i uređivanje recepta}
+    \label{slk:dodavanje_uredivanje_recepta}
+\end{figure}
+
+Jedna od bitnih dodatnih funkcionalnosti je i praćenje nedostatka neke namirnice. U detaljima recepta aplikacija dodatno računa i prikazuje sekciju "Nedostaje", gdje se za svaki sastojak koji nedostaje prikazuje koliko je dostupno, koliko je potrebno i koliki je deficit, uključujući mjernu jedinicu. To korisniku omogućuje izravnu povezanost između planiranja kuhanja i stvarnog stanja zaliha.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=0.30\textheight,keepaspectratio]{dodatci/recepti_nedostaje.png}
+    \caption{Sastojci koji nedostaju}
+    \label{slk:nedostaje}
+\end{figure}
+
+Zadnja funkcionalnost ovog zaslona je pretraživanje recepata po autoru ili nazivu recepta. Korisnik na vrhu ima traku za pretraživanje gdje unosi željeni recept ili ime korisnika čije recepte želi.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.60\textwidth,keepaspectratio]{dodatci/pretrazivanje.png}
+    \caption{Pretraživanje recepata}
+    \label{slk:pretrazivanje_recepata}
+\end{figure}
+
+
 
 
 
 \subsection{Planiranje obroka}
+Posljednja ikonica u nizu na navigacijskoj traci odnosi se na zaslon za planiranje obroka. Taj zaslon omogućava korisniku planiranje obroka za 3 naredna dana, pri čemu se plan prikazuje po vrstama obroka, odnosno doručak, ručak i večera. Nakon učitavanja zaslona, aplikacija dohvaća tipove obroka, postojeći plan i listu recepata iz baze podataka. Korisnik na vrhu odabire dan(prikazan je i datum) te zatim pregledava, dodaje ili briše planirane obroke.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=0.40\textheight,keepaspectratio]{dodatci/plan_obroka.png}
+    \caption{Planiranje obroka}
+    \label{slk:plan}
+\end{figure}
+
+Za dodavanje recepta, korisnik ima gumb u donjem desnom kutu. Klikom na njega otvara se forma za dodavanje recepta. Korisnik prvo odabire tip obroka želi isplanirati, a zatim iz padajuće liste odabire recept koji želi napraviti za taj obrok. U formi se vide prijedlozi za obroke koji su napravljeni pomoću heuristike i strojnog učenja, no o tome u sljedećem poglavlju. Korisnik može odabrati jedan od predloženih recepata, a može i normalnim putem iz baze svih recepata odabrati jedan. 
+
+
+\begin{figure}[H]
+    \centering
+
+    \begin{subfigure}[t]{0.45\textwidth}
+        \centering
+        \includegraphics[height=0.35\textheight,keepaspectratio]{dodatci/dodavanjeo_broka.png}
+        \caption{Forma za dodavanje obroka}
+        \label{slk:dodavanje_obroka}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.45\textwidth}
+        \centering
+        \includegraphics[height=0.35\textheight,keepaspectratio]{dodatci/recept_dodan_uplan.png}
+        \caption{Dodan recept}
+        \label{slk:uredivanje_recepta}
+    \end{subfigure}
+
+    \caption{Dodavanje obroka}
+    \label{slk:dodavanje_uredivanje_recepta}
+\end{figure}
+
+Na slici vidimo da korisnik dodatno može pregledavati detalje tog recepta te ga obrisati iz plana obroka. Važan dio funkcionalnosti je označavanje obroka kao "Napravljeno". Kada korisnik potvrdi tu akciju, sustav u jednoj transakciji smanjuje zalihe prema sastojcima recepta i tada označava obrok kao izvršen. Za primjer, ako smo za recept za obrok stavili Piletinu s pommesom i imamo dovoljno namirnica za to, nakon što kliknemo "Napravljeno", iz naše zalihe namirnica automatski će se smanjiti količina piletine i pommesa za onoliko koliko je potrebno u tom receptu.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=0.28\textheight,keepaspectratio]{dodatci/obavljen_recept.png}
+    \caption{Obavljeni obrok}
+    \label{slk:obavobro}
+\end{figure}
+
 \subsection{Strojno učenje i heuristika}
+U aplikaciji je sustav preporuke za plan prehrane implementiran kao "hibridni" pristup. Koristimo strojno učenje
+
+
 \subsection{Jedinični i funkcionalni testovi}
 
 \chapter{Korištene tehnologije i alati}

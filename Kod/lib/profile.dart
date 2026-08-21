@@ -96,122 +96,7 @@ class _ProfilePageState extends State<ProfilePage> {
     Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
   }
 
-  //dodati u budućnosti
-  Future<void> _showChangePasswordDialog() async {
-    final oldPasswordController = TextEditingController();
-    final newPasswordController = TextEditingController();
-    final confirmPasswordController = TextEditingController();
-    final formKey = GlobalKey<FormState>();
 
-    Future<void> submit() async {
-      if (!formKey.currentState!.validate()) return;
-
-      final oldPass = oldPasswordController.text;
-      final newPass = newPasswordController.text;
-
-      final validOld = await DbQueries.checkUserCredentials(_email, oldPass);
-      if (!validOld) {
-        if (!mounted) return;
-        await showDialog<void>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Greška'),
-            content: const Text('Trenutna lozinka nije točna.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
-              ),
-            ],
-          ),
-        );
-        return;
-      }
-
-      await DbQueries.changePassword(
-        mail: _email,
-        newPlainPassword: newPass,
-      );
-
-      if (!mounted) return;
-      Navigator.pop(context); // zatvori change pass dialog
-      await showDialog<void>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Uspjeh'),
-          content: const Text('Lozinka je uspješno promijenjena.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      );
-    }
-
-    await showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Text('Promijeni lozinku'),
-        content: Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: oldPasswordController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Trenutna lozinka',
-                ),
-                validator: (v) =>
-                (v == null || v.isEmpty) ? 'Unesite trenutnu lozinku' : null,
-              ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: newPasswordController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Nova lozinka',
-                ),
-                validator: (v) =>
-                (v == null || v.isEmpty) ? 'Unesite novu lozinku' : null,
-              ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: confirmPasswordController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Potvrdi novu lozinku',
-                ),
-                validator: (v) {
-                  if (v == null || v.isEmpty) return 'Potvrdite novu lozinku';
-                  if (v != newPasswordController.text) return 'Lozinke se ne podudaraju';
-                  return null;
-                },
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Odustani'),
-          ),
-          ElevatedButton(
-            onPressed: submit,
-            child: const Text('Spremi'),
-          ),
-        ],
-      ),
-    );
-
-    oldPasswordController.dispose();
-    newPasswordController.dispose();
-    confirmPasswordController.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -285,14 +170,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      /*SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: _showChangePasswordDialog,
-                          icon: const Icon(Icons.lock_reset),
-                          label: const Text('Promijeni lozinku'),
-                        ),
-                      ),*/
+
                       const SizedBox(height: 12),
                       SizedBox(
                         width: double.infinity,

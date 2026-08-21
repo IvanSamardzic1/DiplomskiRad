@@ -7,13 +7,15 @@ import 'authscreen.dart';
 import 'profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'sql_connection.dart';
-import 'zaliheKorisnika.dart';
 import 'recepti.dart';
-import 'plan_prehrane.dart';
 
+const String kHomeTitle = 'Aplikacija za praćenje namirnica';
+
+// Glavna funkcija aplikacije
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Prvo uspostavljamo vezu s SQL Serverom
   try {
     await SqlConnectionService.instance.connect();
     debugPrint('SQL konekcija uspješno uspostavljena.');
@@ -36,13 +38,15 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
 
+      // Postavljamo početni zaslon na AuthGate koji provjerava jel korisnik prijavljen
       home: const AuthGate(),
       routes: {
+        // Home ruta koja vodi na početnu stranicu
         '/home': (context) =>
-        const MyHomePage(title: 'Aplikacija za pracenje namirnica'),
+        const MyHomePage(title: kHomeTitle),
       },
 
-      //home: const MyHomePage(title: 'Aplikacija za praćenje namirnica'),
+      // Isključujemo debug banner
       debugShowCheckedModeBanner: false,
     );
   }
@@ -50,7 +54,7 @@ class MyApp extends StatelessWidget {
 
 class AuthGate extends StatefulWidget {
   const AuthGate({super.key});
-
+  // klasa  koja provjerava prijavljenost korisnika
   @override
   State<AuthGate> createState() => _AuthGateState();
 }
@@ -63,7 +67,8 @@ class _AuthGateState extends State<AuthGate> {
     super.initState();
     _isLoggedInFuture = _loadLoginState();
   }
-
+  // dohvaćamo isLoggedIn iz SharedPreferences kako bi provjerili je li korisnik prijavljen
+  // ako ga nema, vraća false
   Future<bool> _loadLoginState() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool('isLoggedIn') ?? false;
@@ -74,6 +79,7 @@ class _AuthGateState extends State<AuthGate> {
     return FutureBuilder<bool>(
       future: _isLoggedInFuture,
       builder: (context, snapshot) {
+        // Ako još uvijek čekamo na dohvat podataka, prikazujemo indikator učitavanja
         if (snapshot.connectionState != ConnectionState.done) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
@@ -81,7 +87,7 @@ class _AuthGateState extends State<AuthGate> {
         }
 
         if (snapshot.data == true) {
-          return const MyHomePage(title: 'Aplikacija za pracenje namirnica');
+          return const MyHomePage(title: kHomeTitle);
         }
 
         return const AuthScreen();
@@ -90,6 +96,7 @@ class _AuthGateState extends State<AuthGate> {
   }
 }
 
+// Glavna stranica aplikacije koja sadrži navigacijsku traku
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
@@ -103,7 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
   // Indeks trenutno odabranog ekrana
   int _selectedIndex = 0;
 
-  // f+Funkcija za promjenu ekrana
+  // Funkcija za promjenu ekrana, mijenja _selectedIndex i osvježava stanje
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -118,27 +125,29 @@ class _MyHomePageState extends State<MyHomePage> {
         page = HomePage(); // Početna stranica
         break;
       case 1:
-        page = const ZalihaNamirnicePage();
+        page = const ZalihaNamirnicePage(); // Stranica s zalihama namirnica
         break;
       case 2:
-        page = TrgovinaPage(); // Stranica s trgovinom
+        page = TrgovinaPage(); // Stranica s popisom za trgovinu
         break;
       case 3:
-        page = const ReceptiPage();
+        page = const ReceptiPage(); // Stranica s receptima
         break;
       case 4:
-        page = const PlanPrehranePage();
+        page = const PlanPrehranePage(); // Stranica s planom obroka
         break;
 
       default:
         page = HomePage();
     }
 
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
         actions: [
+          // Ikona profila koja vodi na stranicu profila korisnika
           IconButton(
             icon: const Icon(Icons.person),
             onPressed: () {
@@ -150,6 +159,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
+      // dodajemo navigacijsku traku na dno ekrana
       body: page,
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[

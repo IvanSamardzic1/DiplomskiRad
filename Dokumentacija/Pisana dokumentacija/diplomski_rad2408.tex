@@ -597,6 +597,47 @@ U aplikaciji je sustav preporuke za plan prehrane implementiran kao "hibridni" p
 
 \subsection{Jedinični i funkcionalni testovi}
 
+Jedan od dodatnih zadataka u ovom diplomskom je da se prilikom pisanja koda posebna pozornost obrati na pisanje i izvršavanje jediničnih testova i na pokrivenost koda s tako napisanim jediničnim testovima te da je konačnu funkcionalnost cijele aplikacije potrebno provjeriti korištenjem funkcijskih testova. 
+
+\subsubsection{Jedinični testovi}
+Jedinični testovi provjeravaju najmanje dijelove aplikacije, poput metoda, pomoćnih funkcija i logike unutar widgeta, ali izolirano od cijelog sustava. Cilj jediničnih testova je brzo otkriti greške u implementaciji i osigurati da se promjene u kodu ne odraze negativno na već postojeću funkcionalnost. U ovom diplomskom radu jedinični testovi su usmjereni na provjeru ispravnosti poslovne logike, validacije unosa i graničnih slučajeva. U nastavku ćemo pogledati napravljene jedinične testove.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=0.4\textheight,keepaspectratio]{dodatci/jedinicni_testovi.png}
+    \caption{Jedinični testovi}
+    \label{slk:jedtest}
+\end{figure}
+
+Popis svih datoteka jediničnih testova
+\begin{enumerate}
+    \item authscreen\_test.dart -> vezano uz authscreen.dart, testira UI tabove(Login i Register), validacija forme, login scenarije(nepostojeći korisnik, kriva lozinka, uspješna lozinka + spremanje sesije) i register scenarije(validacija, već postojeći mail, uspješan insert + navigacija nakon uspješnog registera)
+    \item heuristika\_test.dart -> vezano uz heuristika.dart, testira izračun score-a (granice 0-100, penalizaciju ispod praga, utjecaj vremena i user history), te top recepte(sortiranje, limit, prazan input)
+    \item main\_test.dart -> vezano uz main.dart, testira konfiguraciju MyApp, ponašanje AuthGate za prijavljenog ili neprijavljenog korisnika i navigaciju po BottomNavigationBar karticama
+    \item ml\_test.dart -> vezano uz ml\_scoring.dart, testira učitavanje modela iz asset JSON-a, mapiranje ili parsiranje koeficijenata, te predictProbability grane(z=0, rast signala, null/mising feature, scale == 0 fallback)
+    \item plan\_prehrane\_test.dart -> vezano uz plan\_prehrane.dart, testira render stranice s podatcima plana, prazan plan za prijavljenog korisnika i slučaj bez valjanog emaila (da nema rušenja)
+    \item profile\_test.dart -> vezano uz profile.dart, testira učitavanje profila i inicijala, fallback kada korisnik nije pronađen, izostanak DB upita bez emaila, odjavu(brisanje sesije) i brisanje računa(cancel/confirm)
+    \item recepti\_test.dart -> vezano uz recepti.dart, testira listu recepata, pretragu, indikator nedostajućih sastojaka, error state, dodavanje recepta (validacija/uspjeh), uređivanje, brisanje i detalje recepta
+    \item sqlconn\_test.dart -> vezano uz sql\_connection.dart, testira servis konekcije, propagaciju grešaka, retry nakon greške te query putanje
+    \item test\_seams\_test.dart -> vezano uz test\_seams.dart, testira da DbAppRepository pravilno prosljeđuje upite i mapira rezultate
+    \item trgovina\_test.dart -> vezano uz trgovina.dart, testira prikaz popisa, empty/error state, označavanje kupljenog artikla, uređivanje količine, brisanje stavke i dodavanje nove stavke
+    \item zalihe\_test.dart -> vezano uz zaliheKorisnika.dart, testira prikaz zaliha i upozorenja(istek roka ili minimalna količina), dodavanje zalihe, uređivanje i brisanje zalihe
+\end{enumerate}
+
+Pokrivenost koda mjeri koliki je udio izršivih linija koda aktiviran tijekom pokretanja testova. U ovom radu pokrivenost se mjeri nad izvornim datotekama u mapi lib, pri čemu se postotak računa na testabilnim linijama koda. Za svaku datoteku zasebno prikazani su broj pokrivenih i ukupnih testabilnih linija te pripadni postotak, što omogućuje precizno uočavanje slabije pokrivenih dijelova sustava. Pokrivenost koda jediničnim testovima u ovom projektu je 80.42\%, a pokrivenost po datotekama vidljivo na donjoj slici. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textheight,keepaspectratio]{dodatci/pokrivenost_koda.png}
+    \caption{Pokrivenost koda jediničnim testovima}
+    \label{slk:pokrivenost}
+\end{figure}
+
+
+
+\subsubsection{Funkcionalni testovi}
+Funkcionalni testovi provjeravaju ponašanje aplikacije iz perspektive korisničkih scenarija, odnosno testiraju kako više komponenti radi zajedno u stvarnom toku korištenja. Za razliku od jediničnih testova, ovdje je naglasak na kompletnom procesu (npr. prijava korisnika, rad na zalihama itd.), a ne samo na pojedinim metodama. Time se potvrđuje da sustav kao cjelina isporučuje očekivanu funkcionalnost. U nastavku ćemo pogledati napravljene funkcionalne testove.
+
 \chapter{Korištene tehnologije i alati}
 \subsubsection{Android Studio} 
 Aplikacija je pisana u Android Studiu. To je integrirano razvojno okruženje namijenjeno za Android platformu. Vrlo moćan alat za razvoj aplikacija napravljen od strane Google-a za izradu, testiranje i deploy Android aplikacija. Također omogućava testiranje aplikacije na fizičkom uređaju i pomoću emulatora. \cite{AndroidStudio}

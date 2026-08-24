@@ -9,8 +9,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'sql_connection.dart';
 import 'recepti.dart';
 
-const String kHomeTitle = 'Aplikacija za praćenje namirnica';
-
 // Glavna funkcija aplikacije
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,7 +41,7 @@ class MyApp extends StatelessWidget {
       routes: {
         // Home ruta koja vodi na početnu stranicu
         '/home': (context) =>
-        const MyHomePage(title: kHomeTitle),
+        const MyHomePage(title: 'Aplikacija za praćenje namirnica'),
       },
 
       // Isključujemo debug banner
@@ -87,7 +85,7 @@ class _AuthGateState extends State<AuthGate> {
         }
 
         if (snapshot.data == true) {
-          return const MyHomePage(title: kHomeTitle);
+          return const MyHomePage(title: 'Aplikacija za praćenje namirnica');
         }
 
         return const AuthScreen();

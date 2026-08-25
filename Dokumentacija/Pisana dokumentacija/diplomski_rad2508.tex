@@ -638,6 +638,35 @@ Pokrivenost koda mjeri koliki je udio izršivih linija koda aktiviran tijekom po
 \subsubsection{Funkcionalni testovi}
 Funkcionalni testovi provjeravaju ponašanje aplikacije iz perspektive korisničkih scenarija, odnosno testiraju kako više komponenti radi zajedno u stvarnom toku korištenja. Za razliku od jediničnih testova, ovdje je naglasak na kompletnom procesu (npr. prijava korisnika, rad na zalihama itd.), a ne samo na pojedinim metodama. Time se potvrđuje da sustav kao cjelina isporučuje očekivanu funkcionalnost. U nastavku ćemo pogledati napravljene funkcionalne testove.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textheight,keepaspectratio]{dodatci/funkcionalni_testovi.png}
+    \caption{Funkcionalni testovi}
+    \label{slk:funtest}
+\end{figure}
+
+Integration\_test mapa sadrži end-to-end testove koji pokreću stvarnu aplikaciju i klikaju UI kao pravi korisnik. Većina testova ovisi o stvarnim podacima u bazi i postojećem korisniku te većina njih ima cleanup korake tako da run testova bude ponovljiv i da se baza ne puni testnim podatcima. Datoteke u mapi su:
+
+\begin{enumerate}
+    \item auth\_login\_test.dart
+    \\
+    Ovaj test testira osnovni auth tok: login + odjava + povratak na auth ekran. Scenarij prvo pokrene aplikaciju i prepoznaje stanje, ako je korisnik već na home ekranu, test radi odjavu prije same prijave. Za login korake on pronalazi dva polja za unos podataka, unosi hardcodirani email i lozinku i zatim klikne na Login. Nakon login-a očekuje naslov home ekrana "Aplikacija za praćenje namirnica", te na kraju radi odjavu i provjerava da je prikazan gumb Prijava/Registracija. čime vraća sustav u početno stanje
+    \item recepti\_test.dart
+    \\
+    Ovaj test testira dodavanje recepata sa sastojcima i naknadno brisanje recepata. Prvo s home stranice navigiramo na stranicu s receptima, te zatim odmah po dolasku na stranicu gleda postoji li već recept kojeg želi napraviti. Ako postoji i ako je autor isti, briše ga. Ako ga nema, otvara formu za unos recepta, te unosi naziv, vrijeme pripreme i opis. Zatim dodaje sastojak iz dropdown liste, te ima mogućnost listanja liste zbog njene dužine. Za svaki sastojak unosi količinu, te zatim odabire "Dodavanje recepta". Nakon spremanja, provjerava da je recept vidljiv na zaslonu, te kasnije briše recept kako bi doveo sustav u stanje u kojem ga je pronašao.
+    \item registracija\_test.dart
+    \\
+    U ovom testu fokus je na registraciji i validaciji duplikata maila. U testu se prvo osigurava da se kreće iz odjavljenog stanja. Imamo 2 glavna scenarija. U prvom scenariju se generira jedinstveni email pomoću funkcije vremena kako bi se izbjegle kolizije, te se popunjavaju polja(ime, prezime, email, lozinka, te potvrda). Zatim se verificira redirect na home ekran nakon uspješne registracije. Ulazi se u profil, provjerava da je novonastali račun s tim emailom prikazan. Zatim se čiste testni podatci brisanjem računa i provjerava povratak na auth ekran. U drugom scenariju korisnik se pokušava registrirati koristeći hardcodirani, već korišteni mail, te se očekuje poruka da je taj email već registriran.
+    \item trgovina\_flow\_test.dart
+    \\
+    Ovo je ujedno najveći test u funkcionalnim testovima. Pokriva tokove popisa za trgovinu uključujući i uređivanje i stanje "kupljeno". Prvo dolazimo na ekran za upravljenje popisom za trgovinu, te pokuša pronaći stavku koju želi dodati u testu te ju briše ako postoji. U prvom testu, dodaje određenu stavku. Prvo u formi za dodavanje iz dropdown liste odabire kategoriju, zatim sastojak i na kraju potrebnu količinu. Tu testira i verifikaciju da ne možemo dodati količinu "0". Zatim ide na uređivanje iste te stavke, ulazi kroz gumb za uređivanje, mijenja količinu i zatim potvrđuje sa "Spremi". Nakon toga obavlja "kupnju". Označuje stavku kao "kupljenu" , potvrđuje kupnju u dijalogu te se nakon toga očekuje da je stavka obrisana. Drugi test je dodavanje stavke istim tokom kao u prethodnom testu te se odmah testira brisanje stavke te potvrda odluke.
+    \item zalihe\_crud\_test.dart
+    \\
+    Ovaj test pokriva CRUD tok za korisničke zalihe namirnica(dodavanje, uređivanje, brisanje). Prvo kroz navigacijsku traku odlazimo na zaslon zaliha korisnika. Ako korisnik nekim slučajem nije ulogiran, prvo se odradi logiranje korisnika. Odmah nakon toga, funkcija briše ciljnu namirnicu ako već postoji. Zatim slijedi scenarij dodavanja. Otvara se dijalog za dodavanje namirnice. Zatim se bira kategorija, a zatim i sam sastojak kroz dva dropdowna. Unosi se količina i minimalna količina koju korisnik želi imati, te se odabire datum roka trajanja i zatim spremanje. Nakon spremanja provjerava da je namirnica prikazana s očekivanom količinom. Nakon toga testira uređivanje, odabire gumb za to, te u formi za uređivanje mijenja količinu, spremi i nakon toga provjeri novu vrijednost. Na samom kraju obriše tu namirnicu i potvrdi da je nestala s liste. U ovom testu je važno odabrati sastojak koji postoji pod tom kategorijom i pod tim nazivom u bazi podataka.
+\end{enumerate}
+
+
+
 \chapter{Korištene tehnologije i alati}
 \subsubsection{Android Studio} 
 Aplikacija je pisana u Android Studiu. To je integrirano razvojno okruženje namijenjeno za Android platformu. Vrlo moćan alat za razvoj aplikacija napravljen od strane Google-a za izradu, testiranje i deploy Android aplikacija. Također omogućava testiranje aplikacije na fizičkom uređaju i pomoću emulatora. \cite{AndroidStudio}

@@ -937,31 +937,56 @@ class DbQueries {
     final rows = await _query('''
     SELECT
       r.idRecept,
-      $tipObrokaId AS tipObroka,
+      $tipObrokaId AS trazeniTipObrokaId,
       ISNULL(r.vrijemePripreme, 0) AS vrijemePripremeMin,
-      ISNULL(uo.userOdabranBefore, 0) AS userOdabranBefore,
-      ISNULL(ui.userIzvrsenBefore, 0) AS userIzvrsenBefore,
-      ISNULL(ge.globalnoIzvrsenBefore, 0) AS globalnoIzvrsenBefore
+      CAST(
+        ISNULL(
+          CAST(SUM(CASE
+            WHEN ISNULL(z.kolicina, 0) >= ISNULL(rs.potrebnaKolicina, 0) THEN 1
+            ELSE 0
+          END) AS FLOAT) / NULLIF(COUNT(rs.idSastojak), 0),
+          0.0
+        ) AS FLOAT
+      ) AS pokrivenostZaliha,
+
+      CAST(
+        ISNULL(
+          AVG(
+            CASE
+              WHEN z.datum IS NULL THEN 0.0
+              WHEN DATEDIFF(day, GETDATE(), z.datum) <= 3 THEN 1.0
+              WHEN DATEDIFF(day, GETDATE(), z.datum) <= 7 THEN 0.7
+              WHEN DATEDIFF(day, GETDATE(), z.datum) <= 14 THEN 0.4
+              ELSE 0.2
+            END
+          ),
+          0.0
+        ) AS FLOAT
+      ) AS fifoSignal,
+
+      (
+        SELECT COUNT(*)
+        FROM PlanObroka p1
+        WHERE p1.idKorisnik = $idKorisnik
+          AND p1.idRecept = r.idRecept
+          AND ISNULL(p1.odabran, 0) = 1
+      ) AS userOdabranCount,
+
+      (
+        SELECT COUNT(*)
+        FROM PlanObroka p2
+        WHERE p2.idKorisnik = $idKorisnik
+          AND p2.idRecept = r.idRecept
+          AND ISNULL(p2.izvrsen, 0) = 1
+      ) AS userIzvrsenCount
     FROM Recept r
-    LEFT JOIN (
-      SELECT idRecept, COUNT(*) AS userOdabranBefore
-      FROM PlanObroka
-      WHERE idKorisnik = $idKorisnik AND ISNULL(odabran, 0) = 1
-      GROUP BY idRecept
-    ) uo ON uo.idRecept = r.idRecept
-    LEFT JOIN (
-      SELECT idRecept, COUNT(*) AS userIzvrsenBefore
-      FROM PlanObroka
-      WHERE idKorisnik = $idKorisnik AND ISNULL(izvrsen, 0) = 1
-      GROUP BY idRecept
-    ) ui ON ui.idRecept = r.idRecept
-    LEFT JOIN (
-      SELECT idRecept, COUNT(*) AS globalnoIzvrsenBefore
-      FROM PlanObroka
-      WHERE ISNULL(izvrsen, 0) = 1
-      GROUP BY idRecept
-    ) ge ON ge.idRecept = r.idRecept
-    ORDER BY r.naziv ASC
+    LEFT JOIN ReceptSastojak rs
+      ON rs.idRecept = r.idRecept
+    LEFT JOIN Zaliha z
+      ON z.idKorisnik = $idKorisnik
+     AND z.idSastojak = rs.idSastojak
+    GROUP BY r.idRecept, r.vrijemePripreme
+    ORDER BY r.idRecept ASC
   ''');
 
     return rows.map((r) => Map<String, dynamic>.from(r)).toList();

@@ -368,11 +368,12 @@ class _PlanPrehranePageState extends State<PlanPrehranePage> {
 
     final scored = rows.map((r) {
       final score = _ml.predictProbability({
-        'tipObroka': r['tipObroka'],
         'vrijemePripremeMin': r['vrijemePripremeMin'],
-        'userOdabranBefore': r['userOdabranBefore'],
-        'userIzvrsenBefore': r['userIzvrsenBefore'],
-        'globalnoIzvrsenBefore': r['globalnoIzvrsenBefore'],
+        'pokrivenostZaliha': r['pokrivenostZaliha'],
+        'fifoSignal': r['fifoSignal'],
+        'userOdabranCount': r['userOdabranCount'],
+        'userIzvrsenCount': r['userIzvrsenCount'],
+        'trazeniTipObrokaId': r['trazeniTipObrokaId'],
       });
       return {
         'idRecept': int.tryParse(r['idRecept'].toString()) ?? 0,

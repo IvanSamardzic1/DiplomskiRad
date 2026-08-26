@@ -6,7 +6,8 @@ class TipObroka {
   static const int rucak = 2;
   static const int vecera = 3;
 }
-
+// HeuristikaKandidat predstavlja sve signale koji ulaze u heuristicki score
+// za jedan recept i jednog korisnika u trenutnom kontekstu.
 class HeuristikaKandidat {
   final int receptId;
   final int vrijemePripremeMin;
@@ -33,6 +34,9 @@ class HeuristikaKandidat {
 
 class Heuristika {
   // Ukupno 100 bodova
+  // Tezine su ručno odabrane domenski:
+  // najveci utjecaj imaju navike korisnika i zalihe,
+  // a vrijeme i kontekst daju dodatnu korekciju.
   static const double wZalihe = 28.0;
   static const double wFifo = 17.0;
   static const double wVrijeme = 12.0;
@@ -43,19 +47,22 @@ class Heuristika {
   static const double wOdabranUnutarNavika = 10.0;
   static const double wIzvrsenUnutarNavika = 25.0;
 
+  // minimalna pokrivenost zaliha ispod koje se penalizira score
   static const double minCoverageSoftThreshold = 0.80;
 
   static double score({
     required HeuristikaKandidat c,
     required int trazeniTipObrokaId,
   }) {
+    // clamp(0..1) osigurava da ulazni signali ne "pobjegnu" iz normaliziranog raspona.
     final coverage = c.pokrivenostZaliha.clamp(0.0, 1.0);
     final fifo = c.fifoSignal.clamp(0.0, 1.0);
 
     // Krace vrijeme -> veci score
     final vrijemeNorm = (1.0 - (c.vrijemePripremeMin / 60.0)).clamp(0.0, 1.0);
 
-    // Povijesni signali (saturacija kroz log)
+    // Povijesni count signali prolaze kroz log-normalizaciju:
+    // prvih nekoliko interakcija puno znaci, kasnije se efekt smanjuje.
     final odabranNorm = _countToNorm(c.userOdabranCount);
     final izvrsenNorm = _countToNorm(c.userIzvrsenCount);
 
@@ -84,6 +91,8 @@ class Heuristika {
     return total.clamp(0.0, 100.0);
   }
 
+  // topRecipeIds sortira po score-u i vraca najbolja N recepta.
+  // Ovo je deterministicki i interpretabilan ranking.
   static List<int> topRecipeIds({
     required List<HeuristikaKandidat> candidates,
     required int trazeniTipObrokaId,
@@ -102,14 +111,15 @@ class Heuristika {
     return scored.take(limit).map((e) => e.key).toList();
   }
 
+  // Log-normalizacija count signala: prvih nekoliko odabira puno znaci, kasnije se efekt smanjuje.
   static double _countToNorm(int count) {
     if (count <= 0) return 0.0;
     final raw = math.log(1 + count) / math.log(11);
     return raw.clamp(0.0, 1.0);
   }
 
-  /// Kontekst bez prisiljavanja recepta na tip obroka:
-  /// recept moze biti bilo koji obrok, ali score varira po kontekstu.
+  // Kontekst bez prisiljavanja recepta na tip obroka:
+  // recept moze biti bilo koji obrok, ali score varira po kontekstu.
   static double _contextFit({
     required int tipObrokaId,
     required int vrijemePripremeMin,

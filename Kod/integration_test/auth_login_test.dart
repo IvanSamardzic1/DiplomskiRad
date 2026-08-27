@@ -29,7 +29,7 @@ void main() {
       await tester.pumpAndSettle(const Duration(seconds: 2));
 
       final authTitle = find.text('Prijava / Registracija');
-      final homeTitle = find.text('Aplikacija za pracenje namirnica');
+      final homeTitle = find.text('Aplikacija za praćenje namirnica');
 
       // Prvo odjava ako je korisnik vec prijavljen
       if (homeTitle.evaluate().isNotEmpty) {

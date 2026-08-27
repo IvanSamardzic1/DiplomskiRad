@@ -1,0 +1,199 @@
+    @startuml
+
+    top to bottom direction
+    skinparam classAttributeIconSize 0
+    skinparam linetype ortho
+
+    class MyApp {
+        +build(BuildContext context): Widget
+    }
+
+    class AuthGate {
+        +createState(): _AuthGateState
+    }
+
+    class _AuthGateState {
+        -Future<bool> _isLoggedInFuture
+        +initState(): void
+        -_loadLoginState(): Future<bool>
+        +build(BuildContext context): Widget
+    }
+
+    AuthGate --> _AuthGateState
+
+
+    class MyHomePage {
+        +String title
+        +createState(): _MyHomePageState
+    }
+
+    class _MyHomePageState {
+        -int _selectedIndex
+        -_onItemTapped(int index): void
+        +build(BuildContext context): Widget
+    }
+
+    MyHomePage --> _MyHomePageState
+
+
+    class AuthScreen {
+        +createState(): _AuthScreenState
+    }
+
+    class _AuthScreenState {
+        -GlobalKey<FormState> _loginFormKey
+        -GlobalKey<FormState> _registerFormKey
+        -TextEditingController _loginEmailController
+        -TextEditingController _loginPasswordController
+        -bool _loginPasswordVisible
+        -_submitLogin(): Future<void>
+        -_submitRegister(): Future<void>
+        +build(BuildContext context): Widget
+    }
+
+    AuthScreen --> _AuthScreenState
+
+
+    class ReceptiPage {
+        +AppRepository repository
+        +SessionStore sessionStore
+        +createState(): _ReceptiPageState
+    }
+
+    class _ReceptiPageState {
+        -bool _isLoading
+        -String? _error
+        -List<Map<String,dynamic>> _recepti
+        -int? _currentUserId
+        -String _searchQuery
+        -_loadRecepti(): Future<void>
+        -_openAddRecipeDialog(): Future<void>
+        -_openEditRecipeDialog(): Future<void>
+        -_confirmDeleteRecipe(): Future<void>
+        -_openDetails(int idRecept): Future<void>
+        +build(BuildContext context): Widget
+    }
+
+    ReceptiPage --> _ReceptiPageState
+
+
+    class PlanPrehranePage {
+        +AppRepository repository
+        +SessionStore sessionStore
+        +createState(): _PlanPrehranePageState
+    }
+
+    class _PlanPrehranePageState {
+        -bool _loading
+        -int? _idKorisnik
+        -MlScoring _ml
+        -bool _mlReady
+        -List<Map<String,dynamic>> _planRows
+        -List<Map<String,dynamic>> _recepti
+        -int _selectedDayIndex
+        -_initMlAndLoad(): Future<void>
+        -_openAddMealDialogForSelectedDay(): Future<void>
+        +build(BuildContext context): Widget
+    }
+
+    PlanPrehranePage --> _PlanPrehranePageState
+
+
+    class TrgovinaPage {
+        +AppRepository repository
+        +SessionStore sessionStore
+        +createState(): _TrgovinaPageState
+    }
+
+    class _TrgovinaPageState {
+        -bool _isLoading
+        -String? _error
+        -int? _userId
+        -List<Map<String,dynamic>> _stavke
+        -_loadStavke(): Future<void>
+        -_openAddDialog(): Future<void>
+        -_markAsPurchased(): Future<void>
+        -_editStavkaKolicina(): Future<void>
+        -_deleteStavka(): Future<void>
+        +build(BuildContext context): Widget
+    }
+
+    TrgovinaPage --> _TrgovinaPageState
+
+
+    class ZalihaNamirnicePage {
+        +AppRepository repository
+        +SessionStore sessionStore
+        +createState(): _ZalihaNamirnicePageState
+    }
+
+    class _ZalihaNamirnicePageState {
+        -bool _isLoading
+        -String? _error
+        -int? _userId
+        -List<Map<String,dynamic>> _zalihe
+        -_loadZalihe(): Future<void>
+        -_openAddDialog(): Future<void>
+        -_openEditDialog(): Future<void>
+        -_confirmDelete(): Future<void>
+        +build(BuildContext context): Widget
+    }
+
+    ZalihaNamirnicePage --> _ZalihaNamirnicePageState
+
+
+    class ProfilePage {
+        +createState(): _ProfilePageState
+    }
+
+    class _ProfilePageState {
+        -String _ime
+        -String _prezime
+        -String _email
+        -bool _isLoading
+        -_loadUserData(): Future<void>
+        -_logout(): Future<void>
+        -_deleteAccount(): Future<void>
+        +build(BuildContext context): Widget
+    }
+
+    ProfilePage --> _ProfilePageState
+
+
+    class DbQueries {
+        +hashPassword(String password): String
+        +getUserByMail(String mail)
+        +checkUserCredentials(...)
+        +insertUser(...)
+        +getUserIdByMail(String mail)
+        +getZaliheForUser(int idKorisnik)
+        +getReceptiList()
+        +getVrsteObroka()
+    }
+
+    class SqlConnectionService {
+        -bool _isConnected
+        +connect(): Future<void>
+        +ensureConnected(): Future<void>
+        +query(String sql)
+        +execute(String sql)
+    }
+
+    class MlScoring {
+        +List<String> featureOrder
+        +List<double> coef
+        +double intercept
+        +loadFromAsset(String path): Future<void>
+        +predictProbability(Map features): double
+    }
+
+    class Heuristika {
+        +score(...): double
+        +topRecipeIds(...): List<int>
+    }
+
+    DbQueries --> SqlConnectionService
+    _PlanPrehranePageState ..> MlScoring
+    _PlanPrehranePageState ..> Heuristika
+
+    @enduml

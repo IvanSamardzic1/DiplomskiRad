@@ -37,15 +37,14 @@ class Heuristika {
   // Tezine su ručno odabrane domenski:
   // najveci utjecaj imaju navike korisnika i zalihe,
   // a vrijeme i kontekst daju dodatnu korekciju.
-  static const double wZalihe = 28.0;
+  static const double wZalihe = 30.0;
   static const double wFifo = 17.0;
-  static const double wVrijeme = 12.0;
-  static const double wNavike = 35.0;
-  static const double wContextFit = 8.0;
+  static const double wVrijeme = 5.0;
+  static const double wNavike = 50.0;
 
   // Unutar navika: izvrsen je znacajno jaci signal
-  static const double wOdabranUnutarNavika = 10.0;
-  static const double wIzvrsenUnutarNavika = 25.0;
+  static const double wOdabranUnutarNavika = 15.0;
+  static const double wIzvrsenUnutarNavika = 30.0;
 
   // minimalna pokrivenost zaliha ispod koje se penalizira score
   static const double minCoverageSoftThreshold = 0.80;
@@ -59,7 +58,7 @@ class Heuristika {
     final fifo = c.fifoSignal.clamp(0.0, 1.0);
 
     // Krace vrijeme -> veci score
-    final vrijemeNorm = (1.0 - (c.vrijemePripremeMin / 60.0)).clamp(0.0, 1.0);
+    final vrijemeNorm = (1.0 - (c.vrijemePripremeMin / 120.0)).clamp(0.0, 1.0);
 
     // Povijesni count signali prolaze kroz log-normalizaciju:
     // prvih nekoliko interakcija puno znaci, kasnije se efekt smanjuje.
@@ -69,17 +68,12 @@ class Heuristika {
     final navike = (odabranNorm * wOdabranUnutarNavika) +
         (izvrsenNorm * wIzvrsenUnutarNavika);
 
-    final contextFit = _contextFit(
-      tipObrokaId: trazeniTipObrokaId,
-      vrijemePripremeMin: c.vrijemePripremeMin,
-    );
 
     double total = 0.0;
     total += coverage * wZalihe;
     total += fifo * wFifo;
     total += vrijemeNorm * wVrijeme;
     total += navike; // vec je u bodovima 0-35
-    total += contextFit * wContextFit;
 
     // Penal ako je mala pokrivenost zaliha
     if (coverage < minCoverageSoftThreshold) {
@@ -118,30 +112,4 @@ class Heuristika {
     return raw.clamp(0.0, 1.0);
   }
 
-  // Kontekst bez prisiljavanja recepta na tip obroka:
-  // recept moze biti bilo koji obrok, ali score varira po kontekstu.
-  static double _contextFit({
-    required int tipObrokaId,
-    required int vrijemePripremeMin,
-  }) {
-    switch (tipObrokaId) {
-      case TipObroka.dorucak:
-        if (vrijemePripremeMin <= 20) return 1.0;
-        if (vrijemePripremeMin <= 35) return 0.6;
-        return 0.2;
-
-      case TipObroka.rucak:
-        if (vrijemePripremeMin <= 45) return 1.0;
-        if (vrijemePripremeMin <= 70) return 0.7;
-        return 0.4;
-
-      case TipObroka.vecera:
-        if (vrijemePripremeMin <= 30) return 1.0;
-        if (vrijemePripremeMin <= 50) return 0.75;
-        return 0.45;
-
-      default:
-        return 0.6;
-    }
-  }
 }

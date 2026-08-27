@@ -67,6 +67,12 @@ class _ReceptiPageState extends State<ReceptiPage> {
 
   int _toInt(dynamic value) => int.tryParse(value?.toString() ?? '') ?? 0;
 
+  bool _toBool(dynamic value) {
+    final v = value?.toString().trim().toLowerCase() ?? '';
+    return v == '1' || v == 'true';
+  }
+
+
   String _value(dynamic raw, {String fallback = '-'}) {
     final txt = raw?.toString().trim() ?? '';
     return txt.isEmpty ? fallback : txt;
@@ -118,12 +124,13 @@ class _ReceptiPageState extends State<ReceptiPage> {
       builder: (_) => _ReceptFormDialog(
         title: 'Novi recept',
         submitLabel: 'Dodaj',
-        onSubmit: (naziv, opis, vrijeme, sastojci) async {
+        onSubmit: (naziv, opis, vrijeme, jeDorucak, sastojci) async {
           await DbQueries.insertReceptForAuthor(
             autorKorisnikId: _currentUserId!,
             naziv: naziv,
             opis: opis,
             vrijemePripremeMin: vrijeme,
+            jeDorucak: jeDorucak,
             sastojci: sastojci,
           );
         },
@@ -167,14 +174,16 @@ class _ReceptiPageState extends State<ReceptiPage> {
           initialNaziv: _value(detalji['naziv'], fallback: ''),
           initialOpis: _value(detalji['opis'], fallback: ''),
           initialVrijeme: _toInt(detalji['vrijemePripreme']),
+          initialJeDorucak: _toBool(detalji['jeDorucak']),
           initialSastojci: detaljiSastojci,
-          onSubmit: (naziv, opis, vrijeme, sastojci) async {
+          onSubmit: (naziv, opis, vrijeme, jeDorucak, sastojci) async {
             await DbQueries.updateReceptByAuthor(
               idRecept: idRecept,
               autorKorisnikId: _currentUserId!,
               naziv: naziv,
               opis: opis,
               vrijemePripremeMin: vrijeme,
+              jeDorucak: jeDorucak,
               sastojci: sastojci,
             );
           },
@@ -380,6 +389,7 @@ class _ReceptiPageState extends State<ReceptiPage> {
                 final naziv = _value(recept['naziv'], fallback: 'Bez naziva');
                 final autorIme = _value(recept['autorIme'], fallback: 'Nepoznato');
                 final autorId = _toInt(recept['autorKorisnikId']);
+                final jeDorucak = _toBool(recept['jeDorucak']);
                 final isAuthor =
                     _currentUserId != null && _currentUserId == autorId;
                 final hasMissing = _missingByRecipe[idRecept] ?? false;
@@ -396,8 +406,8 @@ class _ReceptiPageState extends State<ReceptiPage> {
                     ),
                     subtitle: Text(
                       hasMissing
-                          ? 'Autor: $autorIme • Nedostaju sastojci'
-                          : 'Autor: $autorIme',
+                          ? 'Autor: $autorIme • ${jeDorucak ? 'Doručak' : 'Ručak/Večera'} • Nedostaju sastojci'
+                          : 'Autor: $autorIme • ${jeDorucak ? 'Doručak' : 'Ručak/Večera'}',
                       style: TextStyle(color: hasMissing ? Colors.red : null),
                     ),
                     trailing: Wrap(
@@ -475,6 +485,11 @@ class _ReceptDetaljiPageState extends State<ReceptDetaljiPage> {
 
   int _toInt(dynamic value) => int.tryParse(value?.toString() ?? '') ?? 0;
 
+  bool _toBool(dynamic value) {
+    final v = value?.toString().trim().toLowerCase() ?? '';
+    return v == '1' || v == 'true';
+  }
+
   String _value(dynamic raw, {String fallback = '-'}) {
     final txt = raw?.toString().trim() ?? '';
     return txt.isEmpty ? fallback : txt;
@@ -551,14 +566,16 @@ class _ReceptDetaljiPageState extends State<ReceptDetaljiPage> {
         initialNaziv: _value(_recept!['naziv'], fallback: ''),
         initialOpis: _value(_recept!['opis'], fallback: ''),
         initialVrijeme: _toInt(_recept!['vrijemePripreme']),
+        initialJeDorucak: _toBool(_recept!['jeDorucak']),
         initialSastojci: _sastojci,
-        onSubmit: (naziv, opis, vrijeme, sastojci) async {
+        onSubmit: (naziv, opis, vrijeme, jeDorucak, sastojci) async {
           await DbQueries.updateReceptByAuthor(
             idRecept: idRecept,
             autorKorisnikId: widget.currentUserId!,
             naziv: naziv,
             opis: opis,
             vrijemePripremeMin: vrijeme,
+            jeDorucak: jeDorucak,
             sastojci: sastojci,
           );
         },
@@ -706,6 +723,10 @@ class _ReceptDetaljiPageState extends State<ReceptDetaljiPage> {
                       Text(
                         'Vrijeme pripreme: ${_value(_recept?['vrijemePripreme'])} min',
                       ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Tip recepta: ${_toBool(_recept?['jeDorucak']) ? 'Doručak' : 'Ručak/Večera'}',
+                      ),
                       const SizedBox(height: 12),
                       const Text(
                         'Opis',
@@ -815,11 +836,13 @@ class _ReceptFormDialog extends StatefulWidget {
   final String initialNaziv;
   final String initialOpis;
   final int? initialVrijeme;
+  final bool initialJeDorucak;
   final List<Map<String, dynamic>> initialSastojci;
   final Future<void> Function(
       String naziv,
       String opis,
       int vrijeme,
+      bool jeDorucak,
       List<Map<String, dynamic>> sastojci,
       )? onSubmit;
 
@@ -829,6 +852,7 @@ class _ReceptFormDialog extends StatefulWidget {
     this.initialNaziv = '',
     this.initialOpis = '',
     this.initialVrijeme,
+    this.initialJeDorucak = false,
     this.initialSastojci = const [],
     this.onSubmit,
   });
@@ -844,6 +868,7 @@ class _ReceptFormDialogState extends State<_ReceptFormDialog> {
   late final TextEditingController _vrijemeController;
   final _sastojakKolicinaController = TextEditingController();
 
+  late bool _jeDorucak;
 
   bool _submitting = false;
   bool _loadingSastojci = true;
@@ -869,6 +894,7 @@ class _ReceptFormDialogState extends State<_ReceptFormDialog> {
       text:
       widget.initialVrijeme == null ? '' : widget.initialVrijeme.toString(),
     );
+    _jeDorucak = widget.initialJeDorucak;
 
     _odabraniSastojci = widget.initialSastojci
         .map<Map<String, dynamic>>(
@@ -1040,7 +1066,7 @@ class _ReceptFormDialogState extends State<_ReceptFormDialog> {
     });
 
     try {
-      await widget.onSubmit!(naziv, opis, vrijeme, _odabraniSastojci);
+      await widget.onSubmit!(naziv, opis, vrijeme,_jeDorucak, _odabraniSastojci);
       if (!mounted) return;
       Navigator.of(context).pop(true);
     } catch (e) {
@@ -1076,6 +1102,17 @@ class _ReceptFormDialogState extends State<_ReceptFormDialog> {
                     final t = (v ?? '').trim();
                     if (t.isEmpty) return 'Naziv je obavezan';
                     return null;
+                  },
+                ),
+                const SizedBox(height: 8),
+                CheckboxListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Ovo je recept za doručak'),
+                  value: _jeDorucak,
+                  onChanged: (v) {
+                    setState(() {
+                      _jeDorucak = v ?? false;
+                    });
                   },
                 ),
                 const SizedBox(height: 12),

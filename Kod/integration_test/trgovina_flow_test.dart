@@ -32,7 +32,7 @@ Future<void> ensureLoggedIn(
       required String email,
       required String password,
     }) async {
-  final homeTitle = find.text('Aplikacija za pracenje namirnica');
+  final homeTitle = find.text('Aplikacija za praćenje namirnica');
   final authTitle = find.text('Prijava / Registracija');
 
   if (homeTitle.evaluate().isNotEmpty) return;

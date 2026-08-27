@@ -21,7 +21,7 @@ Future<void> pumpUntilFound(
 
 // Osigurava da svaki test krece iz poznatog stanja, a to je odjavljen korisnik
 Future<void> logoutIfLoggedIn(WidgetTester tester) async {
-  final homeTitle = find.text('Aplikacija za pracenje namirnica');
+  final homeTitle = find.text('Aplikacija za praćenje namirnica');
   if (homeTitle.evaluate().isEmpty) return;
 
   final profileIcon = find.byIcon(Icons.person);
@@ -87,7 +87,7 @@ void main() {
 
       // Ako se korisnik uspjesno registrirao, trebao bi biti preusmjeren na
       // home screen. Provjeravamo da li je home screen prikazan
-      final homeTitle = find.text('Aplikacija za pracenje namirnica');
+      final homeTitle = find.text('Aplikacija za praćenje namirnica');
       await pumpUntilFound(tester, homeTitle);
       expect(homeTitle, findsOneWidget);
 

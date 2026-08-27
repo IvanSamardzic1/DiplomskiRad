@@ -77,7 +77,7 @@ class _SqlStub {
   Future<List<Map<String, Object?>>> query(String sql) async {
     queriedSql.add(sql);
 
-    if (throwOnInsert && sql.contains('INSERT INTO Recept (naziv, opis, vrijemePripreme, autorKorisnikId)')) {
+    if (throwOnInsert && sql.contains('INSERT INTO Recept (naziv, opis, vrijemePripreme, autorKorisnikId, jeDorucak)')) {
       throw Exception('insert recept failed');
     }
 
@@ -264,6 +264,7 @@ void main() {
           'naziv': 'Juha',
           'autorIme': 'Ivan Autor',
           'autorKorisnikId': 7,
+          'jeDorucak': false,
         },
       ],
       missing: const <int, bool>{},
@@ -312,7 +313,7 @@ void main() {
     await tester.tap(find.text('Dodaj').last);
     await _pumpUi(tester, ticks: 10);
 
-    expect(sql.queriedSql.any((s) => s.contains('INSERT INTO Recept (naziv, opis, vrijemePripreme, autorKorisnikId)')), isTrue);
+    expect(sql.queriedSql.any((s) => s.contains('INSERT INTO Recept (naziv, opis, vrijemePripreme, autorKorisnikId, jeDorucak)')), isTrue);
   });
 
   testWidgets('add recipe dialog shows submit error when insert fails', (tester) async {

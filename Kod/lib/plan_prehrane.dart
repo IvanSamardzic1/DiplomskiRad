@@ -66,6 +66,17 @@ class _PlanPrehranePageState extends State<PlanPrehranePage> {
     return s == '1' || s == 'true';
   }
 
+  bool _toBool(dynamic value) {
+    final v = value?.toString().trim().toLowerCase() ?? '';
+    return v == '1' || v == 'true';
+  }
+
+  bool _isRecipeAllowedForTip(Map<String, dynamic> recept, int tipObrokaId) {
+    final jeDorucak = _toBool(recept['jeDorucak']);
+    if (tipObrokaId == TipObroka.dorucak) return jeDorucak;
+    return !jeDorucak;
+  }
+
 
   Future<void> _openAddMealDialogForSelectedDay() async {
     if (_idKorisnik == null) return;
@@ -78,12 +89,18 @@ class _PlanPrehranePageState extends State<PlanPrehranePage> {
     List<int> topHeuristicIds = [];
     bool loadingTopHeuristic = false;
 
+
     final saved = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (ctx) {
         return StatefulBuilder(
           builder: (context, setLocal) {
+            final filteredRecepti = (selectedTipId == null)
+                ? <Map<String, dynamic>>[]
+                : _recepti
+                .where((r) => _isRecipeAllowedForTip(r, selectedTipId!))
+                .toList();
             return AlertDialog(
               title: Text('Dodaj obrok (${_dayLabel(_selectedDayIndex).toLowerCase()})'),
               content: SizedBox(
@@ -235,7 +252,7 @@ class _PlanPrehranePageState extends State<PlanPrehranePage> {
                         labelText: 'Recept',
                         border: OutlineInputBorder(),
                       ),
-                      items: _recepti.map((r) {
+                      items: filteredRecepti.map((r) {
                         final id = int.tryParse(r['idRecept']?.toString() ?? '') ?? 0;
                         final naziv = (r['naziv'] ?? '').toString();
                         return DropdownMenuItem<int>(
@@ -404,6 +421,7 @@ class _PlanPrehranePageState extends State<PlanPrehranePage> {
 
     final rows = await DbQueries.getHeuristicCandidatesForUser(
       idKorisnik: _idKorisnik!,
+      tipObrokaId: tipObrokaId
     );
 
     final candidates = rows.map((r) {

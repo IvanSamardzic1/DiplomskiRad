@@ -448,6 +448,7 @@ class DbQueries {
       r.idRecept,
       r.naziv,
       r.autorKorisnikId,
+      ISNULL(r.jeDorucak, 0) AS jeDorucak,
       COALESCE(
         NULLIF(LTRIM(RTRIM(CONCAT(ISNULL(k.ime, ''), ' ', ISNULL(k.prezime, '')))), ''),
         k.email,
@@ -467,10 +468,12 @@ class DbQueries {
     required String naziv,
     required String opis,
     required int vrijemePripremeMin,
+    required bool jeDorucak,
     required List<Map<String, dynamic>> sastojci,
   }) async {
     final safeNaziv = _sqlEscape(naziv.trim());
     final safeOpis = _sqlEscape(opis.trim());
+    final jeDorucakInt = jeDorucak ? 1 : 0;
 
     if (safeNaziv.isEmpty) {
       throw Exception('Naziv recepta je obavezan.');
@@ -504,8 +507,8 @@ class DbQueries {
     BEGIN TRY
       BEGIN TRANSACTION;
 
-      INSERT INTO Recept (naziv, opis, vrijemePripreme, autorKorisnikId)
-      VALUES ('$safeNaziv', '$safeOpis', $vrijemePripremeMin, $autorKorisnikId);
+      INSERT INTO Recept (naziv, opis, vrijemePripreme, autorKorisnikId, jeDorucak)
+      VALUES ('$safeNaziv', '$safeOpis', $vrijemePripremeMin, $autorKorisnikId, $jeDorucakInt);
 
       DECLARE @newId INT = CAST(SCOPE_IDENTITY() AS INT);
 
@@ -540,10 +543,12 @@ class DbQueries {
     required String naziv,
     required String opis,
     required int vrijemePripremeMin,
+    required bool jeDorucak,
     required List<Map<String, dynamic>> sastojci,
   }) async {
     final safeNaziv = _sqlEscape(naziv.trim());
     final safeOpis = _sqlEscape(opis.trim());
+    final jeDorucakInt = jeDorucak ? 1 : 0;
 
     if (safeNaziv.isEmpty) {
       throw Exception('Naziv recepta je obavezan.');
@@ -581,7 +586,8 @@ class DbQueries {
       SET
         naziv = '$safeNaziv',
         opis = '$safeOpis',
-        vrijemePripreme = $vrijemePripremeMin
+        vrijemePripreme = $vrijemePripremeMin,
+        jeDorucak = $jeDorucakInt
       WHERE idRecept = $idRecept
         AND autorKorisnikId = $autorKorisnikId;
 
@@ -648,6 +654,7 @@ class DbQueries {
       r.naziv,
       CAST(r.opis AS NVARCHAR(4000)) AS opis,
       r.vrijemePripreme,
+      ISNULL(r.jeDorucak, 0) AS jeDorucak,
       r.autorKorisnikId,
       COALESCE(
         NULLIF(LTRIM(RTRIM(CONCAT(ISNULL(k.ime, ''), ' ', ISNULL(k.prezime, '')))), ''),
@@ -969,6 +976,7 @@ class DbQueries {
         FROM PlanObroka p1
         WHERE p1.idKorisnik = $idKorisnik
           AND p1.idRecept = r.idRecept
+          AND p1.tipObroka = $tipObrokaId
           AND ISNULL(p1.odabran, 0) = 1
       ) AS userOdabranCount,
 
@@ -977,6 +985,7 @@ class DbQueries {
         FROM PlanObroka p2
         WHERE p2.idKorisnik = $idKorisnik
           AND p2.idRecept = r.idRecept
+          AND p2.tipObroka = $tipObrokaId
           AND ISNULL(p2.izvrsen, 0) = 1
       ) AS userIzvrsenCount
     FROM Recept r
@@ -985,6 +994,12 @@ class DbQueries {
     LEFT JOIN Zaliha z
       ON z.idKorisnik = $idKorisnik
      AND z.idSastojak = rs.idSastojak
+     WHERE
+    (
+      ($tipObrokaId = 1 AND r.jeDorucak = 1)
+      OR
+      ($tipObrokaId IN (2, 3) AND r.jeDorucak = 0)
+    )
     GROUP BY r.idRecept, r.vrijemePripreme
     ORDER BY r.idRecept ASC
   ''');
@@ -996,6 +1011,7 @@ class DbQueries {
   /// Vraca feature-e koje koristi klasa Heuristika.
   static Future<List<Map<String, dynamic>>> getHeuristicCandidatesForUser({
     required int idKorisnik,
+    required int tipObrokaId,
   }) async {
     final rows = await _query('''
     SELECT
@@ -1032,6 +1048,7 @@ class DbQueries {
         FROM PlanObroka p1
         WHERE p1.idKorisnik = $idKorisnik
           AND p1.idRecept = r.idRecept
+          AND p1.tipObroka = $tipObrokaId
           AND ISNULL(p1.odabran, 0) = 1
       ) AS userOdabranCount,
 
@@ -1040,15 +1057,23 @@ class DbQueries {
         FROM PlanObroka p2
         WHERE p2.idKorisnik = $idKorisnik
           AND p2.idRecept = r.idRecept
+          AND p2.tipObroka = $tipObrokaId
           AND ISNULL(p2.izvrsen, 0) = 1
       ) AS userIzvrsenCount
 
     FROM Recept r
+    
     LEFT JOIN ReceptSastojak rs
       ON rs.idRecept = r.idRecept
     LEFT JOIN Zaliha z
       ON z.idKorisnik = $idKorisnik
      AND z.idSastojak = rs.idSastojak
+     WHERE
+    (
+      ($tipObrokaId = 1 AND r.jeDorucak = 1)
+      OR
+      ($tipObrokaId IN (2, 3) AND r.jeDorucak = 0)
+    )
     GROUP BY r.idRecept, r.vrijemePripreme
     ORDER BY r.idRecept ASC
     ''');

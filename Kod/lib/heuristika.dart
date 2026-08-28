@@ -37,14 +37,11 @@ class Heuristika {
   // Tezine su ručno odabrane domenski:
   // najveci utjecaj imaju navike korisnika i zalihe,
   // a vrijeme i kontekst daju dodatnu korekciju.
-  static const double wZalihe = 30.0;
-  static const double wFifo = 17.0;
+  static const double wZalihe = 25.0;
+  static const double wFifo = 15.0;
   static const double wVrijeme = 5.0;
-  static const double wNavike = 50.0;
-
-  // Unutar navika: izvrsen je znacajno jaci signal
-  static const double wOdabranUnutarNavika = 15.0;
-  static const double wIzvrsenUnutarNavika = 30.0;
+  static const double wOdabranUnutarNavika = 20.0;
+  static const double wIzvrsenUnutarNavika = 35.0;
 
   // minimalna pokrivenost zaliha ispod koje se penalizira score
   static const double minCoverageSoftThreshold = 0.80;
@@ -73,7 +70,7 @@ class Heuristika {
     total += coverage * wZalihe;
     total += fifo * wFifo;
     total += vrijemeNorm * wVrijeme;
-    total += navike; // vec je u bodovima 0-35
+    total += navike; // vec je u bodovima 0-50
 
     // Penal ako je mala pokrivenost zaliha
     if (coverage < minCoverageSoftThreshold) {

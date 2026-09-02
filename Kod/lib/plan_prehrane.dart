@@ -47,17 +47,17 @@ class _PlanPrehranePageState extends State<PlanPrehranePage> {
   @override
   void initState() {
     super.initState();
-    _initMlAndLoad();
+    _initLoad();
+    _initMl();
   }
 
-  Future<void> _initMlAndLoad() async {
+  Future<void> _initMl() async {
     try {
       await _ml.loadFromAsset('assets/weights.json');
       _mlReady = true;
     } catch (_) {
       _mlReady = false;
     }
-    _initLoad();
   }
 
   bool _isDoneValue(dynamic raw) {

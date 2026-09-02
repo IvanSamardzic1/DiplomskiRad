@@ -68,7 +68,7 @@
 
 % Sažetak na hrvatskom
 \begin{sazetak}
-Ovaj rad opisuje aplikaciju koja je razvijena kao diplomski projekt za upravljanje prehranom i organizaciju obroka korisnika. Zadaća aplikacije je unaprijediti organizaciju prehrane i potaknuti zdravije životne navike korisnika omogućavanjem evidencije namirnica te pametnijom organizacijom obroka. Korisnik pomoću aplikacije može samostalno planirati obroke za naredne dane na temelju dostupnih namirnica, izrađivati popise za kupovinu i upravljati svojim namirnicama. U radu je provedena i usporedba prijedloga recepata za obroke dobivenih primjenom algoritma strojnog učenja i prijedloga temeljenih na heurističkom pristupu. Također su opisani implementacija aplikacije, način prijenosa korisničkih podataka na različite uređaje i provedeni jedinični i funkcijski testovi.
+Ovaj rad opisuje aplikaciju koja je razvijena kao diplomski rad za upravljanje prehranom i organizaciju obroka korisnika. Zadaća aplikacije je unaprijediti organizaciju prehrane i potaknuti zdravije životne navike korisnika omogućavanjem evidencije namirnica te pametnijom organizacijom obroka. Korisnik pomoću aplikacije može samostalno planirati obroke za naredne dane na temelju dostupnih namirnica, izrađivati popise za kupovinu i upravljati svojim namirnicama. U radu je provedena i usporedba prijedloga recepata za obroke dobivenih primjenom algoritma strojnog učenja i prijedloga temeljenih na heurističkom pristupu. Također su opisani implementacija aplikacije, način prijenosa korisničkih podataka na različite uređaje i provedeni jedinični i funkcijski testovi.
 
 \end{sazetak}
 
@@ -96,13 +96,13 @@ Ovaj rad opisuje aplikaciju koja je razvijena kao diplomski projekt za upravljan
 \chapter{Uvod}
 \label{pog:uvod}
 
-U današnjem vremenu sve je obilježeno ubrzanim načinom života i sve većim brojem obaveza te se pokušava sve digitalizirati i olakšati te je iz toga proizašla ideja za razvojem aplikacije koja će pojedincu olakšati planiranje obroka i planiranje namirnica, bez obzira na to gdje se nalazi. Pa kao takva, ova mobilna aplikacija je stvorena kako bi korisniku bilo puno lakše saznati što od namirnica već ima kod kuće, bez da stoji direktno pred hladnjakom te kako bi na temelju toga mogao izabrati što jesti za koji obrok, što kupiti i slično. Unatoč velikom broju već dostupnih aplikacija, mnoge od njih nude samo djelomična rješenja poput vođenja popisa ili praćenja kalorijskog unosa, dok je integracija upravljanja zalihama često ograničena. 
+U današnjem vremenu sve je obilježeno ubrzanim načinom života i sve većim brojem obaveza te se pokušava sve digitalizirati i olakšati te je iz toga proizašla ideja za razvojem aplikacije koja će pojedincu olakšati planiranje obroka i planiranje namirnica, bez obzira na to gdje se nalazi. Pa kao takva, ova mobilna aplikacija je stvorena kako bi korisniku bilo puno lakše saznati što od namirnica već ima kod kuće, bez da stoji direktno pred hladnjakom te kako bi na temelju toga mogao izabrati što jesti za koji obrok i što kupiti za buduće obroke. Unatoč velikom broju već dostupnih aplikacija, mnoge od njih nude samo djelomična rješenja poput vođenja popisa ili praćenja kalorijskog unosa, dok je integracija upravljanja zalihama često ograničena. 
 
 U sljedećim poglavljima biti će prikazan pregled korištenih tehnologija i koncepata korištenih u razvoju aplikacije, opis arhitekture i implementacijskih detalja, baze podataka te na samom kraju rezultati testiranja i ideje za moguća poboljšanja same aplikacije
 
 \section{Slične aplikacije}
 
-Kao što je navedeno u uvodu, postoje mnoge aplikacije koje imaju slične ciljeve i funkcionalnosti, no u svakoj postoji mjesta za napredak. Navest ću 2 najpopularnije.
+Kao što je navedeno u uvodu, postoje mnoge aplikacije koje imaju slične ciljeve i funkcionalnosti, no u svakoj postoji mjesta za napredak. U nastavku su navedene dvije najpopularnije.
 
 \subsubsection{Paprika Recipe Manager}
 To je aplikacija namijenjena organizaciji recepata, planiranju obroka i popisa za kupovinu. Korisnicima omogućava spremanje recepata iz različitih internetskih izvora te planiranje obroka pomoću ugrađenog kalendara
@@ -128,7 +128,7 @@ Plan To Eat je aplikacija usmjerena na jednostavno planiranje obroka i organizac
 
 \section{Opis aplikacije}
 
-Aplikacija napravljena u sklopu ovog diplomskog rada je aplikacija za planiranje obroka i praćenje zaliha namirnica na Android mobilnim uređajima. Neki od problema koji se pokušavaju riješiti ovom aplikacijom su:
+Aplikacija napravljena u sklopu ovog diplomskog rada služi za planiranje obroka i praćenje zaliha namirnica na Android mobilnim uređajima. Neki od problema koji se pokušavaju riješiti ovom aplikacijom su:
 \begin{enumerate}
     \item Upravljanje zalihama hrane - lakše će se upravljati stanjem s namirnicama u kućanstvu i na temelju toga korisnik će pri kupnji znati što mu fali ili čega ima previše. Uz to, može pratiti i količinu namirnica koje posjeduje i njihov datum isteka
     \item Planiranje obroka - korisnici će moći isplanirati unaprijed što će koji dan pripremati za obrok. Na temelju odabranog recepta, korisniku će se prikazati sve nedostajuće namirnice za taj obrok, čime će si olakšati planiranje kupnje
@@ -136,7 +136,7 @@ Aplikacija napravljena u sklopu ovog diplomskog rada je aplikacija za planiranje
     \item Sastavljanje recepata - korisnik može upisivati svoje recepte u aplikaciju te vidjeti sve ostale recepte drugih korisnika
 \end{enumerate}
 
-Ova proizvod je rezultat tehnološkog projekta, odnosno razvoja Android aplikacije. Sama aplikacija je usmjerena na kućanstva i osobne korisnike. Izrada aplikacije je uključivala izradu korisničkog sučelja, integraciju baze podataka, implementaciju funkcionalnosti i testiranje aplikacije pomoću jediničnih i funkcionalnih testova. 
+Ovaj proizvod je rezultat tehnološkog projekta, odnosno razvoja Android aplikacije. Sama aplikacija je usmjerena na kućanstva i osobne korisnike. Izrada aplikacije je uključivala izradu korisničkog sučelja, integraciju baze podataka, implementaciju funkcionalnosti i testiranje aplikacije pomoću jediničnih i funkcionalnih testova. 
 
 \chapter{Specifikacija zahtjeva}
 \section{Funkcionalni i nefunkcionalni zahtjevi}
@@ -179,11 +179,12 @@ Nefunkcionalni zahtjevi su oni zahtjevi koji opisuju kako sustav treba raditi
 
 \chapter{Arhitektura}
 \section{Arhitektura aplikacije}
-Prema strukturi projekta, aplikacija je organizirana kao višeslojna klijentska arhitektura. Prezentacijski sloj čine svi dokumenti iz mape lib/(zalihe, trgovina, recepti i sl.), dok je centralna navigacija i ulazni tok definiran u main.dart. Stanje prijave, odnosno sesije je lokalno pohranjeno preko SharedPreferences, što olakšava pokretanje aplikacije. Što se tiče podatkovnog sloja, on je odvojen u sql\_connection.dart i dbqueries.dart. U tim datotekama se održava konekcija prema SQL Server bazi i izvršavaju sve CRUD i transakcijske naredbe. Poslovna logika je izdvojena u posebne module, npr heuristika u heuristika.dart a ML bodovanje u ml\_scoring.dart. Sama arhitektura je dodatno prilagođena testiranju kroz apstrakcije u test\_seams.dart te kroz odvojene testove. 
+Prema strukturi projekta, aplikacija je organizirana kao višeslojna klijentska arhitektura. Prezentacijski sloj čine svi dokumenti iz mape lib/(zalihe, trgovina, recepti i sl.), dok je centralna navigacija i ulazni tok definiran u main.dart. Stanje prijave, odnosno sesije, lokalno je pohranjeno pomoću SharedPreferences, mehanizma za lokalnu pohranu manjih količina podataka u obliku parova ključ–vrijednost na uređaju korisnika. Na taj se način stanje prijave zadržava između pokretanja aplikacije, čime se olakšava njezino korištenje.
+ Što se tiče podatkovnog sloja, on je odvojen u sql\_connection.dart i dbqueries.dart. U tim datotekama se održava konekcija prema SQL Server bazi i izvršavaju sve CRUD (eng. Create, Read, Update, Delete) i transakcijske naredbe. Poslovna logika je izdvojena u posebne module, npr heuristika u heuristika.dart a ML bodovanje u ml\_scoring.dart. Sama arhitektura je dodatno prilagođena testiranju kroz apstrakcije u test\_seams.dart te kroz odvojene testove. 
 
 
 \section{Baza podataka}
-Baza podataka je važan i nužan element za ovu Android aplikaciju. U nju se spremaju i iz nje se dohvaćaju svi podatci koje koristimo u aplikaciji. U ovom projektu korištena je Microsoft SQL Server baza podataka, a alat za upravljanje tom bazom koji je korišten je SQL Server Management Studio 19. Odabrana je jer podržava sve značajke koje su potrebne ovoj aplikaciji.
+Baza podataka je važan i nužan element za ovu Android aplikaciju. U nju se spremaju i iz nje se dohvaćaju svi podatci koji se koriste u aplikaciji. U ovom projektu korištena je Microsoft SQL Server baza podataka, a alat za upravljanje tom bazom koji je korišten je SQL Server Management Studio 19. Odabrana je jer podržava sve značajke koje su potrebne ovoj aplikaciji.
 \subsubsection{Model baze podataka}
 
 \begin{figure}[H]
@@ -193,12 +194,12 @@ Baza podataka je važan i nužan element za ovu Android aplikaciju. U nju se spr
   \label{slk:prvaslika}
 \end{figure}
 
-Na gornjoj slici vidimo model baze podataka. Baza se sastoji od 10 tablica, a to su VrstaObroka, PlanObroka, Recept, ReceptSastojak, Korisnik, Zaliha, Sastojak, Velicina, Kategorija i StavkaPopisaTrgovina. Svaka tablica ima svoj privatni ključ i dodatne atribute koji ju opisuju. Na slici se vide i veze između pojedinih tablica. 
+Na gornjoj slici prikazan je model baze podataka. Baza se sastoji od 10 tablica, a to su VrstaObroka, PlanObroka, Recept, ReceptSastojak, Korisnik, Zaliha, Sastojak, Velicina, Kategorija i StavkaPopisaTrgovina. Svaka tablica ima svoj privatni ključ i dodatne atribute koji ju opisuju. Na slici se vide i veze između pojedinih tablica. 
 \\
-\\
+\newpage
 \textbf{Pojedinačni opis entiteta}
 
-Tablica \textbf{Korisnik} predstavlja korisnika naše aplikacije. Svaki korisnik ima svoj identifikator, odnosno privatni ključ te email i hashiranu lozinku za prijavu u aplikaciju, te ime i prezime. 
+Tablica \textbf{Korisnik} predstavlja korisnika  aplikacije. Svaki korisnik ima svoj identifikator, odnosno privatni ključ te email i hashiranu lozinku za prijavu u aplikaciju, te ime i prezime. 
 
 
 \begin{table}[htb]
@@ -216,7 +217,7 @@ prezime & varchar(50) & Not null\\
 \caption{Korisnik}
 \end{table}
 
-Tablica \textbf{Zaliha} je tablica koja označava sve zalihe u našoj aplikaciji. Sastoji se od idZaliha koji je primarni ključ ove tablice, te je tu i idKorisnik pomoću kojeg se spaja na tablicu Korisnik i označava pripadnost zalihe određenom korisniku. Sljedeći atribut je idSastojak pomoću kojeg se spaja na tablicu Sastojak i označava koji sastojak je ta zaliha. Tu su i atributi kolicina(količina sastojka), datum(rok trajanja) i min(minimalna količina zalihe nakon koje dolazi upozorenje). 
+Tablica \textbf{Zaliha} je tablica koja označava sve zalihe u aplikaciji. Sastoji se od idZaliha koji je primarni ključ ove tablice, te je tu i idKorisnik pomoću kojeg se spaja na tablicu Korisnik i označava pripadnost zalihe određenom korisniku. Sljedeći atribut je idSastojak pomoću kojeg se spaja na tablicu Sastojak i označava koji sastojak je ta zaliha. Tu su i atributi kolicina(količina sastojka), datum(rok trajanja) i min(minimalna količina zalihe nakon koje dolazi upozorenje). 
 
 
 \begin{table}[htb]
@@ -300,7 +301,7 @@ kolicina & int & Not null\\
 \caption{StavkaPopisaTrgovina}
 \end{table}
 
-Tablica \textbf{Recept} označava recepte koji se prikazuju u aplikaciji. Sama tablica sastoji se od idRecept koji je primarni ključ, naziv koji označava naziv recepta, opis koji označava opis recepta, vrijemePripreme i autorKorisnikId koji označava koji korisnik je unio taj recept u aplikaciju. Naime, onaj koji unese ima ovlasti i za brisanje i uređivanje recepta kasnije. AutorKorisnikId je ujedno i strani ključ kojim se vežemo na tablicu Korisnik. Zadnji redak označava jeDorucak. On nam kasnije pomaže pri predlaganju recepata pomoću heuristike i strojnog učenja.
+Tablica \textbf{Recept} označava recepte koji se prikazuju u aplikaciji. Sama tablica sastoji se od idRecept koji je primarni ključ, naziv koji označava naziv recepta, opis koji označava opis recepta, vrijemePripreme i autorKorisnikId koji označava koji korisnik je unio taj recept u aplikaciju. Naime, onaj koji unese ima ovlasti i za brisanje i uređivanje recepta kasnije. AutorKorisnikId je ujedno i strani ključ kojim se tablica povezuje na tablicu Korisnik. Zadnji redak označava jeDorucak koji kasnije pomaže pri predlaganju recepata pomoću heuristike i strojnog učenja.
 
 \begin{table}[H]
 \label{tbl:Recept}
@@ -334,7 +335,7 @@ potrebnaKolicina & int & Not null\\
 \caption{ReceptSastojak}
 \end{table}
 
-Tablica \textbf{PlanObroka} služi kako bi korisnik mogao planirati svoje buduće obroke. Sastoji se od idPlanObroka, koji je primarni ključ, onda idKorisnik pomoću kojeg se povezujemo na tablicu Korisnik i pomoću kojeg označavamo koji korisnik je dodao nešto u svoj plan obroka, zatim idRecept pomoću kojeg se spajamo na tablicu Recept te koji govori koji recept je odabran za neki obrok. Uz to, tu je i datumObrok, tipObroka koji se spaja na tablicu vrstaObroka i dva dodatna atributa izvrsen i odabran koji kasnije služe pri predlaganju obroka. 
+Tablica \textbf{PlanObroka} služi kako bi korisnik mogao planirati svoje buduće obroke. Sastoji se od idPlanObroka, koji je primarni ključ, onda idKorisnik pomoću kojeg se tablica povezuje na tablicu Korisnik i pomoću kojeg označavamo koji korisnik je dodao nešto u svoj plan obroka, zatim idRecept pomoću kojeg se spajamo na tablicu Recept te koji govori koji recept je odabran za neki obrok. Uz to, tu je i datumObrok, tipObroka koji se spaja na tablicu vrstaObroka i dva dodatna atributa izvrsen i odabran koji kasnije služe pri predlaganju obroka. 
 
 \begin{table}[H]
 \label{tbl:PlanObroka}
@@ -368,7 +369,7 @@ ime & nvarchar(50) & Not null\\
 \end{table}
 
 \section{Struktura koda}
-Aplikacija koristi jednostavnu strukturu koda gdje su funkcionalnosti usredotočene na direktnu komunikaciju s bazom podataka, prikaz dohvaćenih podataka u widgetima unutra Fluttera te upravljanje tim dohvaćenim podatcima. Strukturu projekta vidimo na donjoj slici. 
+Aplikacija koristi jednostavnu strukturu koda gdje su funkcionalnosti usredotočene na direktnu komunikaciju s bazom podataka, prikaz dohvaćenih podataka u widgetima unutra Fluttera te upravljanje tim dohvaćenim podatcima. Struktura projekta prikazana je na donjoj slici. 
 
 
 \begin{figure}[H]
@@ -390,18 +391,18 @@ Aplikacija koristi jednostavnu strukturu koda gdje su funkcionalnosti usredotoč
     \label{slk:struktura_testova}
 \end{figure}
 
-Vidimo 4 glavne mape, a to su coverage, integration\_test, lib i test. Uz to, od vaznijih datoteka tu je i pubspec.yaml. Pubspec.yaml je glavna konfiguracijska datoteka u kojoj su definirani metapodatci projekta, vanjski paketi i resursi aplikacije. U coverage mapi se nalaze datoteke pomoću kojih sam provjeravao pokrivenost koda jediničnim testovima, a u test mapi su svi ti jedinični testovi koji su detaljnije objašnjeni u nastavku rada. U integration\_test mapi nalaze se funkcionalni testovi, dok je u lib datoteci "srce" naše aplikacije, odnosno središnji dio gdje se nalazi kod same aplikacije.
+Projekt se sastoji od 4 glavne mape, a to su coverage, integration\_test, lib i test. Uz to, od važnijih datoteka tu je i pubspec.yaml. Pubspec.yaml je glavna konfiguracijska datoteka u kojoj su definirani metapodatci projekta, vanjski paketi i resursi aplikacije. U coverage mapi se nalaze datoteke koje su korištene za provjeru pokrivenosti koda jediničnim testovima, a u test mapi su svi ti jedinični testovi koji su detaljnije objašnjeni u nastavku rada. U integration\_test mapi nalaze se funkcionalni testovi, dok je u lib datoteci "srce" aplikacije, odnosno središnji dio gdje se nalazi kod same aplikacije.
 \\
 Objašnjenja lib mape:
 \begin{enumerate}
     \item authscreen.dart -> Datoteka koja implementira zaslon za prijavu i registraciju korisnika. Sadrži validaciju unosa, te obradu autentifikacije. Koristi SharedPreferences za spremanje stanja sesije.
-    \item dbqueries.dart -> Datoteka koja predstavlja centralni sloj za pristup bazi podataka i sadrži SQL upite za sve funkcionalnosti sustava. Implementirane su i transakcijske operacije kako bi se osigurala konzisentnost podataka kod složenijih promjena. Osim klasičnog CRUD-a, datoteka priprema i značajke za heurističko i strojno preporučivanje recepata.
+    \item dbqueries.dart -> Datoteka koja predstavlja centralni sloj za pristup bazi podataka i sadrži SQL upite za sve funkcionalnosti sustava. Implementirane su i transakcijske operacije kako bi se osigurala konzistentnost podataka kod složenijih promjena. Osim klasičnog CRUD-a, datoteka priprema i značajke za heurističko i strojno preporučivanje recepata.
     \item heuristika.dart -> U ovoj datoteci definiran je heuristički model za rangiranje recepata na temelju dostupnosti namirnica, vremena pripreme i korisničkih navika. Model koristi ponderirani zbroj uz normalizaciju pojedinih signala te dodatnu penalizaciju za nisku pokrivenost zaliha. Rezultat je deterministička top-N preporuka recepata.
     \item home.dart -> Datoteka sadrži jednostavnu početnu stranicu aplikacije s uvodnom porukom korisniku i pozadinskom slikom. Njezina uloga je informativna i služi kao ulazna točka nakon prijave. Ne sadrži poslovnu logiku ni interakcije s bazom podataka.
     \item main.dart  -> Ova datoteka definira ulaznu točku aplikacije i inicijalnu konfiguraciju. U njoj se prije pokretanja korisničkog sučelja pokušava uspostaviti SQL konekcija te provjerava stanje prijave kroz AuthGate. Također implementira glavnu navigaciju aplikacije preko donje navigacijske trake i povezivanje svih glavnih stranica.
     \item ml\_scoring.dart -> Datoteka implementira izvođenje logističkog modela unutar Flutter aplikacije koristeći parametre učitane iz assets/weights.json. Učitavaju se redoslijed značajki, koeficijenti, presjek i parametri skaliranja, a zatim se računa vjerojatnost pomoću sigmoidne funkcije. Time aplikacija koristi prethodno istrenirani mode strojnog učenja.
-    \item plan\_prehrane.dart -> Ovaj modul upravlja planiranjem obroka za trodnevni period te omogućaje dodavanje, pregled i brisanje planiranih obroka. Integrira dva pristupa preporukama(strojno učenje i heuristika)   i prikazuje korisniku top 3 prijedloga za odabrani tip obroka. Također omogućuje označavanje obroka kao izvršenog, pri čemu se transakcijski ažuriraju zalihe namirnica.
-    \item profile.dart -> Datoteka implementira profil korisnika s prikazom osnovnih podataka dohvaćenih iz baze prema prijavljenom mailu. Korisniku su omogućene odjava i brisanje korisničkog računa. Nakon navednih akcija, stanje sesije prijave se briše iz SharedPreferences i korisnik se vraća na početni autentikacijski tok.
+    \item plan\_prehrane.dart -> Ovaj modul upravlja planiranjem obroka za trodnevni period te omogućuje dodavanje, pregled i brisanje planiranih obroka. Integrira dva pristupa preporukama(strojno učenje i heuristika)   i prikazuje korisniku top 3 prijedloga za odabrani tip obroka. Također omogućuje označavanje obroka kao izvršenog, pri čemu se transakcijski ažuriraju zalihe namirnica.
+    \item profile.dart -> Datoteka implementira profil korisnika s prikazom osnovnih podataka dohvaćenih iz baze prema prijavljenom mailu. Korisniku su omogućene odjava i brisanje korisničkog računa. Nakon navedenih akcija, stanje sesije prijave se briše iz SharedPreferences i korisnik se vraća na početni autentikacijski tok.
     \item recepti.dart -> Ovaj modul upravlja pregledom i pretraživanjem recepata te omogućuje dodavanje, uređivanje i brisanje recepata za autore. Uključuje i detaljan prikaz recepta sa sastojcima, vremenom pripreme i ostalim detaljima. 
     \item sql\_connection.dart -> Datoteka koja služi kao sloj spajanja na SQL server kroz sql\_conn paket. Također sadrži test seams koji omogućuju zamjenu stvarnih SQL handlera lažnim tijekom jediničnih testiranja.
     \item test\_seams.dart -> Datoteka u kojoj su definirana sučelja koja omogućuju pristup podatcima i sesiji korisnika ali na način da olakšava jedinično testiranje jer omogućuje injektiranje lažnih repozitorija i kontrolu ponašanja ovisnosti.
@@ -410,7 +411,7 @@ Objašnjenja lib mape:
     
 \end{enumerate}
 
-Ispod vidimo dijagrame klasa za ovaj projekt. Razdovojeni su na tri dijela radi bolje preglednosti.
+U nastavku su prikazani dijagrami klasa. Razdvojeni su na tri dijela radi bolje preglednosti.
 
 \begin{figure}[H]
     \centering
@@ -443,7 +444,7 @@ Zbog većeg broja klasa i preglednosti, dijagram klasa aplikacije podijeljen je 
 \chapter{Funkcionalnosti aplikacije}
 Funkcionalnosti aplikacije su napravljene tako da pokriju sve funkcionalne i nefunkcionalne zahtjeve. Cilj je bio da korištenje aplikacije zaista bude intuitivna i jednostavna svim generacijama i da ju svatko može koristiti bez posebnih uputa
 \section{Početni zaslon}
-Početni zaslon implementiran je tako da pri pokretanju prvo provjerava stanje korisničke sesije, odnosno ključ koji imam u SharedPreferences isLoggedIn. Taj ključ vraća boolean vrijednost koja nam govori je li korisnik već bio prijavljen ili nije. Dok se to učitava, pokazuje se indikator učitavanja kako bi dobili jasan prijelaz, a ne prazan ekran. Ako je korisnik već bio prijavljen, otvara se glavni zaslon s porukom dobrodošlice, a ako nije otvara se zaslon za prijavu, odnosno registraciju korisnika. Na dnu početnog zaslona, ako je korisnik prijavljen, vidi se navigacijska traka koja služi kao vodič kroz aplikaciju, gdje korisnik može "preskakati" sa zaslona na zaslon. Time početni zaslon ima dvostruku ulogu: ulaznu kontrolu pristupa i usmjeravanje korisnika.
+Početni zaslon implementiran je tako da pri pokretanju prvo provjerava stanje korisničke sesije, odnosno ključ pohranjen u SharedPreferences isLoggedIn. Taj ključ vraća boolean vrijednost koja označava je li korisnik već bio prijavljen ili nije. Dok se to učitava, pokazuje se indikator učitavanja kako bi se ostvario jasan prijelaz, a ne prazan ekran. Ako je korisnik već bio prijavljen, otvara se glavni zaslon s porukom dobrodošlice, a ako nije otvara se zaslon za prijavu, odnosno registraciju korisnika. Na dnu početnog zaslona, ako je korisnik prijavljen, vidi se navigacijska traka koja služi kao vodič kroz aplikaciju, gdje korisnik može "preskakati" sa zaslona na zaslon. Time početni zaslon ima dvostruku ulogu: ulaznu kontrolu pristupa i usmjeravanje korisnika.
 
 \begin{figure}[H]
     \centering
@@ -467,10 +468,10 @@ Početni zaslon implementiran je tako da pri pokretanju prvo provjerava stanje k
 \end{figure}
 
 \section{Prijava i registracija korisnika}
-Na slici gore desno možemo vidjeti formu za prijavu, odnosno registraciju korisnika. S tim je objedinjena autentifikacija korisnika. Na vrhu vidimo dva taba, jedan je za prijavu, drugi za registraciju. Jedina razlika je što kod registracije moramo dodati i ime, prezime i potvrditi lozinku. Pri unosu podataka provode se osnovne validacije(obavezno polje, format e-maila, složenost lozinke i potvrda lozinke), čime se smanjuje broj neispravnih zahtjeva prema bazi.
+Na slici gore desno prikazana je forma za prijavu, odnosno registraciju korisnika. S tim je objedinjena autentifikacija korisnika. Na vrhu se nalaze dva taba, jedan je za prijavu, drugi za registraciju. Jedina razlika je što je kod registracije potrebno dodati i ime, prezime i potvrditi lozinku. Pri unosu podataka provode se osnovne validacije(obavezno polje, format e-maila, složenost lozinke i potvrda lozinke), čime se smanjuje broj neispravnih zahtjeva prema bazi.
 Pri prijavi, najprije se provjerava postoji li korisnik te ako postoji ispravnost lozinke, a zatim se nakon uspješne prijave stanje sesije sprema u SharedPreferences(isLoggedIn i loggedInEmail) i korisnik se preusmjeri na glavni zaslon. Kod registracije se provjerava još i jedinstvenost e-mail adrese, te ako se uspješno registrira, automatski je i prijavljen i nastavlja rad bez dodatnog koraka prijave. 
 \section{Profil korisnika}
-U gornjem desnom kutu početnog zaslona vidimo malu ikonu "osobe". Klikom na taj gumb dolazimo na profil prijavljenog korisnika. On služi za prikaz osnovnih korisničkih podataka i upravljanja računom. Podaci se dohvaćaju iz baze na temelju prijavljenog e-maila pohranjenog u lokalnoj sesiji, a korisniku su dostupne akcije odjave i brisanja računa(uz eksplicitnu potvrdu). Odjava brište podatke sesije i vraća korisnika na početni autentikacijski tok, dok brisanje računa uklanja korisnički zapis iz baze te također resetira sesiju. 
+U gornjem desnom kutu početnog zaslona nalazi se mala ikona "osobe". Klikom na taj gumb otvara se  profil prijavljenog korisnika. On služi za prikaz osnovnih korisničkih podataka i upravljanja računom. Podaci se dohvaćaju iz baze na temelju prijavljenog e-maila pohranjenog u lokalnoj sesiji, a korisniku su dostupne akcije odjave i brisanja računa(uz eksplicitnu potvrdu). Odjava brište podatke sesije i vraća korisnika na početni autentikacijski tok, dok brisanje računa uklanja korisnički zapis iz baze te također resetira sesiju. 
 
 \begin{figure}[H]
     \centering
@@ -481,7 +482,7 @@ U gornjem desnom kutu početnog zaslona vidimo malu ikonu "osobe". Klikom na taj
 
 \section{Zalihe namirnica}
 
-Na početnom zaslonu na dnu vidimo ikonicu "kutije" koja označava pohranu, odnosno zalihe namirnica. Klikom na taj gumb otvara se zaslon zadužen za upravljanje zalihama namirnicama. 
+Na dnu početnog zaslona nalazi se ikonica "kutije" koja označava pohranu, odnosno zalihe namirnica. Klikom na taj gumb otvara se zaslon zadužen za upravljanje zalihama namirnicama. 
 
 \begin{figure}[H]
     \centering
@@ -490,7 +491,7 @@ Na početnom zaslonu na dnu vidimo ikonicu "kutije" koja označava pohranu, odno
     \label{slk:zalihe}
 \end{figure}
 
-Na slici vidimo kako izgleda taj ekran. Na zaslonu korisnik vidi sve svoje trenutno dostupne namirnice, s količinom, jedinicom mjere, kategorijom i rokom trajanja. Korisnik uz svaku stavku ima i ikonu za uređivanje količine, datuma roka ili minimalne količine, te ikonu za brisanje određene namirnice, pri čemu mora dodatno eksplicitno potvrditi brisanje. Na dnu stranice nalazi se gumb za dodavanje, čime se otvara forma za dodavanje namirnice. Korisnik pri dodavanju prvo iz padajuće liste bira kategoriju, zatim odabire koju namirnicu želi dodati, te unosi količinu, minimalnu količinu (količina nakon koje mu aplikacija javlja da treba kupiti dodatnu količinu) te datum roka trajanja. 
+Na slici je prikazan izgled tog zaslona. Na zaslonu korisnik vidi sve svoje trenutno dostupne namirnice, s količinom, jedinicom mjere, kategorijom i rokom trajanja. Korisnik uz svaku stavku ima i ikonu za uređivanje količine, datuma roka ili minimalne količine, te ikonu za brisanje određene namirnice, pri čemu mora dodatno eksplicitno potvrditi brisanje. Na dnu stranice nalazi se gumb za dodavanje, čime se otvara forma za dodavanje namirnice. Korisnik pri dodavanju prvo iz padajuće liste bira kategoriju, zatim odabire koju namirnicu želi dodati, te unosi količinu, minimalnu količinu (količina nakon koje mu aplikacija javlja da treba kupiti dodatnu količinu) te datum roka trajanja. 
 
 \begin{figure}[H]
     \centering
@@ -521,7 +522,7 @@ Sljedeći zaslon na redu je popis za trgovinu, a njegova ikonica je treća na na
     \label{slk:popis}
 \end{figure}
 
-Na samom dnu zaslona opet imamo gumb za dodavanje namirnica. Korisnik vrlo lako može dodati novu stavku na popis za trgovinu jer koristimo obrazac s padajućom listom i time vodimo korisnika do odabira kategorije i do odabira sastojka, čime se smanjuje mogućnost pogrešnog unosa i osigurana konzistentnost naziva namirnica u aplikaciji. 
+Na samom dnu zaslona ponovno se nalazi gumb za dodavanje namirnica. Korisnik vrlo lako može dodati novu stavku na popis za trgovinu jer se koristi obrazac s padajućom listom i time se  korisnika vodi do odabira kategorije i do odabira sastojka, čime se smanjuje mogućnost pogrešnog unosa i osigurana konzistentnost naziva namirnica u aplikaciji. 
 
 \begin{figure}[H]
     \centering
@@ -556,7 +557,7 @@ Dodatna, posebna funkcionalnost je označavanje stavke kao kupljene. Kad korisni
 
 
 \section{Upravljanje receptima}
-Treća ikona po redu u navigavijskoj traci vodi nas na zaslon upravljanja receptima gdje korisnik ima pregled svih recepata u sustavu. 
+Treća ikona po redu u navigacijskoj traci vodi nas na zaslon upravljanja receptima gdje korisnik ima pregled svih recepata u sustavu. 
 
 \begin{figure}[H]
     \centering
@@ -564,7 +565,7 @@ Treća ikona po redu u navigavijskoj traci vodi nas na zaslon upravljanja recept
     \caption{Zaslon - recepti}
     \label{slk:recepti}
 \end{figure}
-Na slici vidimo popis recepata koji su trenutno u bazi podataka. Svaka stavka sadrži osnovne informacije o autoru, a recepti za koje korisniku nedostaju sastojci su istaknuti crvenom bojom, čime se odmah signalizira njihova trenutna neizvedivost. Ispod imena recepta imamo i naglašeno koji je to obrok, a može biti "doručak" ili "ručak/večera" Klikom na recept, korisnik otvara detalje svakog recepta, gdje može vidjeti opis, vrijeme pripreme, tip obroka i kompletan popis sastojaka s potrebnim količinama.
+Na slici je prikazan zaslon popisa recepata koji su trenutno u bazi podataka. Svaka stavka sadrži osnovne informacije o autoru, a recepti za koje korisniku nedostaju sastojci su istaknuti crvenom bojom, čime se odmah signalizira njihova trenutna neizvedivost. Ispod imena recepta je naglašeno koji je to obrok, a može biti "doručak" ili "ručak/večera" Klikom na recept, korisnik otvara detalje svakog recepta, gdje može vidjeti opis, vrijeme pripreme, tip obroka i kompletan popis sastojaka s potrebnim količinama.
 
 \begin{figure}[H]
     \centering
@@ -573,7 +574,7 @@ Na slici vidimo popis recepata koji su trenutno u bazi podataka. Svaka stavka sa
     \label{slk:detalji_recepta}
 \end{figure}
 
-Kao što možemo vidjeti na slici 4.9., na jednoj stavci vidimo da se nalaze gumbi za brisanje i uređivanje. Oni se pojavljuju samo na receptima koje je dodao korisnik koji je trenutno prijavljen. Na slici vidimo da je autor recepta korisnik Jakov, te možemo zaključiti da je on prijavljeni korisnik. On može svoj recept brisati i uređivati, dok ostale samo može pregledati. Svaki korisnik može dodati novi recept. Pri dodavanju i kod ažuriranja koristi se forma s validacijama (obavezan naziv, vrijeme pripreme > 0, barem jedan sastojak, količina sastojka > 0), čime osiguravamo kvalitetu podataka prije spremanja. U samoj formi za dodavanje imamo i checkbox kojim se označava da je to recept za doručak. To radimo jer kasnije pri predlaganju recepata doručak tretiramo drukčije od ručka i večere što poboljšava predlaganje recepata. Taj checkbox se i pri uređivanju može korigirati i promijeniti.
+Kao što je vidljivo na slici 4.9., na jednoj stavci vidimo da se nalaze gumbi za brisanje i uređivanje. Oni se pojavljuju samo na receptima koje je dodao korisnik koji je trenutno prijavljen. Na slici je prikazano da je autor recepta korisnik Jakov, te se može zaključiti da je on prijavljeni korisnik. On može svoj recept brisati i uređivati, dok ostale samo može pregledati. Svaki korisnik može dodati novi recept. Pri dodavanju i kod ažuriranja koristi se forma s validacijama (obavezan naziv, vrijeme pripreme > 0, barem jedan sastojak, količina sastojka > 0), čime je osigurana kvaliteta podataka prije spremanja. U samoj formi za dodavanje nalazi se i checkbox kojim se označava da je to recept za doručak. To se označava jer kasnije pri predlaganju recepata doručak se tretira drukčije od ručka i večere što poboljšava predlaganje recepata. Taj checkbox se i pri uređivanju može korigirati i promijeniti.
 
 \begin{figure}[H]
     \centering
@@ -628,7 +629,7 @@ Posljednja ikonica u nizu na navigacijskoj traci odnosi se na zaslon za planiran
     \label{slk:plan}
 \end{figure}
 
-Za dodavanje recepta, korisnik ima gumb u donjem desnom kutu. Klikom na njega otvara se forma za dodavanje recepta. Korisnik prvo odabire tip obroka želi isplanirati, a zatim iz padajuće liste odabire recept koji želi napraviti za taj obrok. U formi se vide prijedlozi za obroke koji su napravljeni pomoću heuristike i strojnog učenja, no o tome u sljedećem poglavlju. Korisnik može odabrati jedan od predloženih recepata, a može i normalnim putem iz baze svih recepata odabrati jedan. 
+Za dodavanje recepta, korisnik ima gumb u donjem desnom kutu. Klikom na njega otvara se forma za dodavanje recepta. Korisnik prvo odabire tip obroka koji želi isplanirati, a zatim iz padajuće liste odabire recept koji želi napraviti za taj obrok. U formi se vide prijedlozi za obroke koji su napravljeni pomoću heuristike i strojnog učenja, no o tome u sljedećem poglavlju. Korisnik može odabrati jedan od predloženih recepata, a može i normalnim putem iz baze svih recepata odabrati jedan. 
 
 
 \begin{figure}[H]
@@ -652,7 +653,7 @@ Za dodavanje recepta, korisnik ima gumb u donjem desnom kutu. Klikom na njega ot
     \label{slk:dodavanje_uredivanje_recepta}
 \end{figure}
 
-Na slici vidimo da korisnik dodatno može pregledavati detalje tog recepta te ga obrisati iz plana obroka. Važan dio funkcionalnosti je označavanje obroka kao "Napravljeno". Kada korisnik potvrdi tu akciju, sustav u jednoj transakciji smanjuje zalihe prema sastojcima recepta i tada označava obrok kao izvršen. Za primjer, ako smo za recept za obrok stavili Piletinu s pommesom i imamo dovoljno namirnica za to, nakon što kliknemo "Napravljeno", iz naše zalihe namirnica automatski će se smanjiti količina piletine i pommesa za onoliko koliko je potrebno u tom receptu.
+Na slici je vidljivo da korisnik dodatno može pregledavati detalje tog recepta te ga obrisati iz plana obroka. Važan dio funkcionalnosti je označavanje obroka kao "Napravljeno". Kada korisnik potvrdi tu akciju, sustav u jednoj transakciji smanjuje zalihe prema sastojcima recepta i tada označava obrok kao izvršen. Za primjer, ako je za obrok odabran recept Piletine s pommesom i imamo dovoljno namirnica za to, nakon što kliknemo "Napravljeno", iz zalihe namirnica automatski će se smanjiti količina piletine i pommesa za onoliko koliko je potrebno u tom receptu.
 
 \begin{figure}[H]
     \centering
@@ -662,33 +663,52 @@ Na slici vidimo da korisnik dodatno može pregledavati detalje tog recepta te ga
 \end{figure}
 
 \section{Strojno učenje i heuristika}
-U aplikaciji su implementirana dva paralelna pristupa preporuci recepata: model strojnog učenja i heuristički model. Oba pristupa koriste vrlo slične ulazne signale (vrijeme pripreme, pokrivenost zaliha, korisničke navike i fifo signal(signal za namirnice s kraćim rokom trajanja)), ali se razlikuju u načinu donošenja odluka. Strojno učenje koristi parametre naučene iz povijesnih podataka, dok heuristika koristi ručno definirana pravila i težine. U korisničkom sučelju pri biranju recepta za obrok, oba sustava vraćaju top-3 prijedloga za odabrani tip obroka, čime je moguće usporediti njihovo ponašanje u istim uvjetima.
+U aplikaciji su implementirana dva paralelna pristupa preporuci recepata: model strojnog učenja i heuristički model. Oba pristupa koriste vrlo slične ulazne signale (vrijeme pripreme, pokrivenost zaliha, korisničke navike i prioritet roka trajanja). Prioritet roka trajanja koristi se za davanje prednosti receptima koji sadrže namirnice s bližim datumom isteka roka trajanja.Pristupi se razlikuju u načinu na koji navedene signale koriste pri donošenju odluka.
+ Strojno učenje koristi parametre naučene iz povijesnih podataka, dok heuristika koristi ručno definirana pravila i težine. U korisničkom sučelju pri biranju recepta za obrok, oba sustava vraćaju tri najbolje rangirana prijedloga za odabrani tip obroka, čime je moguće usporediti njihovo ponašanje u istim uvjetima.
 
 \subsubsection{Strojno učenje}
-Strojno učenje u aplikaciji realizirano je kroz nekoliko međusobno povezanih dijelova koji zajedno čine cjelinu od treniranja modela do prikaza preporuka korisniku. Sam model ne trenira se unutar Flutter aplikacije, nego se treniranje provodi zasebno u Pythonu, nakon čega se naučeni parametri prenose u aplikaciju.
+Strojno učenje u aplikaciji realizirano je kroz nekoliko međusobno povezanih dijelova koji zajedno čine cjelinu od treniranja modela do prikaza preporuka korisniku. Sam model ne trenira se unutar Flutter aplikacije, nego se treniranje provodi zasebnoj aplikaciji napisanoj u programskom jeziku Python. Nakon treniranja, naučeni parametri modela, koji su zajednički za sve korisnike, prenose se u Flutter aplikaciju, dok se preporuke prilagođavaju pojedinom korisniku na temelju njegovih ulaznih podataka i prethodnog ponašanja.
 \\
-Skripta ml.py, koja se ne nalazi u lib mapi, služi za treniranje modela. Ona učitava podatke iz dataset.csv, priprema ulazne značajke i ciljnu vrijednost te podatke dijeli na skup za treniranje i skup za testiranje pomoću za to napravljenih funkcija(kod mene je to train\_test\_split). Dataset.csv je datoteka koja je rezultat upita u bazi podataka, pomoću koje dobivamo potrebne informacije za treniranje našeg modela. Prije samog testiranja, značajke se standardiziraju pomoću StandardScaler kako bi sve ulazne vrijednosti bile na usporedivoj skali i kako pojedine značajke ne bi imale veći utjecaj samo zbog svog raspona. Nakon toga trenira se model logističke regresije. Zatim nakon zavšetka testiranja skripta izvozi redoslijed značajki, koeficijente modela, intercept vrijednosti mean i scale korištene pri standardizaciji. Ti se podatci izvode u weights.json.
-\\ Ta datoteka, weights.json, predstavlja poveznicu između Python dijela sustava i Flutter aplikacije. Ona ne sadrži programski kod, već naučene parametre modela. Na taj način, aplikacija koristi istrenirani model i samo računa vjerojatnosti za nove podatke korisnika. Model koristi značajke vrijemePripremeMin, pokrivenostZaliha, fifoSignal, userOdabranCount i userIzvrsenCount. Iz spremljenih težina, vidi se da najveći pozitivni utjecaj ima broj prethodno izvršenih recepata, što je i najbitnije, jer time dobivamo rezultat koji odgovara predlaganju recepata koje korisnik najčešće izvrši. Najmanji utjecaj ima vrijeme pripreme.
+Za treniranje nije korištena gotova aplikacija za strojno učenje, već je izrađena vlastita Python skripta ml.py. Za obradu tabličnih podataka u skripti se koristi biblioteka pandas, dok se za implementaciju postupka strojnog učenja koristi biblioteka scikit-learn. Sam algoritam logističke regresije nije implementiran od početka, već se koristi njegova implementacija dostupna kroz klasu LogisticRegression. Skripta učitava podatke iz datoteke dataset.csv, priprema ulazne značajke i ciljnu vrijednost te pomoću funkcije train\_test\_split dijeli podatke na skup za treniranje i skup za testiranje, pri čemu se 80\% podataka koristi za treniranje, a preostalih 20\% za testiranje modela. Datoteka dataset.csv dobivena je upitom nad bazom podataka i sadrži informacije potrebne za treniranje modela. Ulazni skup podataka sastoji se od zapisa o receptima i prethodnom ponašanju korisnika. Za treniranje se koristi šest ulaznih značajki: vrijeme pripreme recepta, pokrivenost potrebnih namirnica zalihama korisnika, prioritet roka trajanja, broj prethodnih odabira recepta, broj prethodnih izvršenja recepta te traženi tip obroka. Ciljna vrijednost označena je atributom label i poprima vrijednost 0 ili 1, ovisno o tome je li recept izvršen. Na temelju tih podataka model uči povezanost između navedenih značajki i vjerojatnosti izvršenja pojedinog recepta. Prije treniranja značajke se standardiziraju pomoću klase StandardScaler iz biblioteke scikit-learn, koja svaku značajku transformira tako da ima srednju vrijednost 0 i standardnu devijaciju 1. Time se ulazne vrijednosti dovode na usporedivu skalu i sprječava se da pojedine značajke imaju veći utjecaj na model samo zbog većeg raspona svojih vrijednosti. Nakon toga trenira se model logističke regresije pozivom metode fit, pri čemu model na temelju skupa za treniranje određuje koeficijente pojedinih značajki koji se kasnije koriste za izračun vjerojatnosti. Nakon treniranja model se provjerava na prethodno izdvojenom skupu za testiranje, a dobiveni parametri izvoze se za korištenje u mobilnoj aplikaciji. U datoteku weights.json spremaju se redoslijed značajki, koeficijenti modela, konstantni član logističke regresije (intercept) te vrijednosti mean i scale korištene pri standardizaciji. Na taj način priprema podataka, odabir značajki, postupak treniranja, provjera modela i prijenos dobivenih parametara u mobilnu aplikaciju definirani su u skripti ml.py, dok se za samu implementaciju algoritama i pomoćnih postupaka koriste funkcionalnosti biblioteka pandas i scikit-learn.
+\\ Datoteka weights.json predstavlja poveznicu između skripte za treniranje modela i mobilne aplikacije te ne sadrži programski kod, već podatke dobivene treniranjem modela koji su potrebni za izračun preporuka. Značajke predstavljaju ulazne podatke na temelju kojih model strojnog učenja izračunava vjerojatnost da će korisnik izvršiti određeni recept.U modelu se koristi pet značajki: vrijemePripremeMin, koja predstavlja vrijeme pripreme recepta u minutama, pokrivenostZaliha, koja označava u kojoj su mjeri potrebne namirnice dostupne u korisnikovim zalihama, fifoSignal, koji predstavlja prioritet potrošnje namirnica prema datumu isteka roka trajanja, userOdabranCount, koji predstavlja broj prethodnih odabira recepta, te userIzvrsenCount, koji predstavlja broj prethodnih izvršenja recepta. Tijekom treniranja logističke regresije svakoj se ulaznoj značajki određuje koeficijent koji opisuje njezin utjecaj na rezultat modela. Pozitivan koeficijent povećava, a negativan smanjuje izračunatu vjerojatnost izvršenja recepta s porastom vrijednosti odgovarajuće standardizirane značajke. Osim koeficijenata, u datoteku weights.json spremaju se konstantni član logističke regresije (intercept) te srednje vrijednosti (mean) i vrijednosti skaliranja (scale) dobivene tijekom standardizacije. Spremanje tih vrijednosti potrebno je kako bi se novi ulazni podatci u mobilnoj aplikaciji standardizirali na isti način kao podatci korišteni tijekom treniranja. Model se ne trenira zasebno za svakog korisnika, već se trenira jedan zajednički model nad svim dostupnim zapisima. Personalizacija se ostvaruje prilikom izračuna preporuka jer se za pojedinog korisnika iz baze dohvaćaju njegove vrijednosti značajki, posebice broj prethodnih odabira i izvršenja pojedinog recepta. Zbog toga isti naučeni model može različitim korisnicima dodijeliti različite rezultate za isti recept. Mobilna aplikacija zatim koristi spremljene vrijednosti za izračun vjerojatnosti za nove podatke korisnika. Iz dobivenih koeficijenata vidljivo je da broj prethodnih izvršenja recepta ima najveći pozitivan utjecaj na izračunatu vjerojatnost da će korisnik izvršiti recept. Na taj se način preporuke prilagođavaju prethodnom ponašanju korisnika, pri čemu se uzimaju u obzir i ostale značajke kako preporuke ne bi ovisile isključivo o prethodno izvršenim receptima.
 \\
-Zatim u lib datoteci imamo datoteku ml\_scoring.dart koja je zadužena za ubacivanje preporuka u našu aplikaciju. Ona prvo učitava podatke iz weights.json i sprema koeficijente, te zatim pomoću njih izračunava linearni rezultat logističke regresije i na njega primjenjuje sigmoidnu funkciju. Rezultat toga je broj između 0 i 1 koji predstavlja vjerojatnost da je određeni recept dobar za korisnika. U dbqueries.dart datoteci pomoću funkcije pripremamo podatke za model na temelju stvarnog stanja baze podataka. Za svakog kandidata dohvaća vrijeme pripreme, pokrivenost zalihama, fifo signal koji daje prednost namirnicama s bližim rokom trajanja te broj prethodnih odabranih i izvršenih recepata za korisnika. U bazu je dodan i atribut jeDorucak, kojim se recepti za dorucak mogu odvojiti od ostalih recepata. Time se sprječava da model predlaže recepte namijenjene za doručak za ručak ili večeru. 
+U mapi lib nalazi se datoteka ml\_scoring.dart koja je zadužena za ubacivanje preporuka u našu aplikaciju. Ona prvo učitava podatke iz weights.json i sprema koeficijente, te zatim pomoću njih izračunava linearni rezultat logističke regresije i na njega primjenjuje sigmoidnu funkciju. Rezultat toga je broj između 0 i 1 koji predstavlja vjerojatnost da je određeni recept dobar za korisnika. U dbqueries.dart datoteci pomoću funkcije pripremaju se podatci za model na temelju stvarnog stanja baze podataka. Za svakog kandidata dohvaća vrijeme pripreme, pokrivenost zalihama, prioritet roka trajanja, koji daje prednost namirnicama s bližim rokom trajanja te broj prethodnih odabranih i izvršenih recepata za korisnika. U bazu je dodan i atribut jeDorucak, kojim se recepti za doručak mogu odvojiti od ostalih recepata. Time se sprječava da model predlaže recepte namijenjene za doručak za ručak ili večeru. Poseban atribut za večeru nije uveden jer se recepti namijenjeni za ručak mogu predlagati i za večeru.
 \\
-Zatim u plan\_prehrane.dart povezujemo model i korisničko sučelje. Pri dodavanju obroka, za odabrani tip obroka, za svakog kandidata se izračunava ML vjerojatnosti, recepti se sortiraju prema toj vrijednosti i korisniku se prikazuju 3 najbolje preporuke. 
+Zatim u plan\_prehrane.dart model se povezuje s korisničkim sučeljem. Pri dodavanju obroka, za odabrani tip obroka, za svakog kandidata se izračunava ML vjerojatnosti, recepti se sortiraju prema toj vrijednosti i korisniku se prikazuju 3 najbolje preporuke. 
 \\
-Važno je naglasiti da korisnik nema eksplicitno naglašeno koje namirnice voli, nego da se takva preferecnija uči kroz povijest odabira recepata. Ako korisnik češće odabire i izvršava određene recepte, njih će model početi rangirati više.
+Važno je naglasiti da korisnik eksplicitno ne navodi koje namirnice preferira, već se njegove preferencije određuju kroz povijest odabira i izvršavanja recepata. Ako korisnik češće odabire i izvršava određene recepte, model strojnog učenja takve će recepte više rangirati pri budućim preporukama. Kao primjer rezultata modela strojnog učenja, na slici ispod prikazane su tri najbolje rangirane preporuke za odabranog korisnika. Preporuke se određuju na temelju trenutnog stanja zaliha i prethodnog ponašanja korisnika, odnosno njegovih dosadašnjih odabira i izvršavanja recepata. Na prikazanom primjeru model kao najbolje rangirane recepte predlaže kruh i maslac, kruh i jogurt te burek sa sirom.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textheight,keepaspectratio]{dodatci/top3ml.png}
+    \caption{Primjer prijedloga recepata metodom strojnog učenja}
+    \label{slk:toptriml}
+\end{figure}
+
 
 \subsubsection{Heuristički pristup}
-Heuristički pristup u aplikaciji koristi unaprijed definirana pravila i ručno određene težine kako bi svakom receptu dodijelio bodovni rezultat. Za razliku od strojnog učenja, heuristika ne uči težine iz podataka, nego se način bodovanja definira izravno u programskom kodu na temelju pretpostavki. U mom slučaju, pretpostavka je da su za kvalitetnu preporuku najvažnije korisnikove dosadašnje navike, zatim dostupnost namirnica, iskorištavanje namirnica kojima se približava rok trajanja te, u manjoj mjeri, vrijeme potrebno za pripremu recepta. Datoteka lib/heuristika.dart predstavlja središnji dio heurističkog sustava. U njoj je definirana klasa HeuristikaKandidat, koja predstavlja jedan recept zajedno sa svim signalima potrebnim za njegovo bodovanje. Za svakog kandidata čuvaju se identifikator recepta, vrijeme pripreme, pokrivenost zaliha, FIFO signal te broj prethodnih odabira i izvršenja tog recepta. 
+Heuristički pristup u aplikaciji koristi unaprijed definirana pravila i ručno određene težine kako bi svakom receptu dodijelio bodovni rezultat. Za razliku od strojnog učenja, heuristika ne uči težine iz podataka, nego se način bodovanja definira izravno u programskom kodu na temelju pretpostavki. Pri definiranju heurističkog pristupa pretpostavljeno je da su za kvalitetnu preporuku najvažnije korisnikove dosadašnje navike, zatim dostupnost namirnica, iskorištavanje namirnica kojima se približava rok trajanja te, u manjoj mjeri, vrijeme potrebno za pripremu recepta. Datoteka lib/heuristika.dart predstavlja središnji dio heurističkog sustava. U njoj je definirana klasa HeuristikaKandidat, koja predstavlja jedan recept zajedno sa svim signalima potrebnim za njegovo bodovanje. Za svakog kandidata čuvaju se identifikator recepta, vrijeme pripreme, pokrivenost zaliha, prioritet roka trajanja te broj prethodnih odabira i izvršenja tog recepta. 
 \\
-Metoda score u klasi Heuristika izračunava konačni rezultat pojedinog recepta kao kombinaciju navednih signala. Pokrivenost ima težinu 25, fifo signal 15, a vrijeme 5. Utjecaj vremena je namjerno smanjen u odnosu na druge kriterije. Dodana je i formula koja dodatno normalizira vrijeme kojom kraći recepti dobivaju veći broj bodova, dok se njihov utjecaj postupno smanjuje kako se vrijeme povećava. Najvažniji dio heuristike predstavljaju korisnikove navike. One se određuju na temelju broja prethodnih odabira i izvršenja pojedinog recepta. Broj prethodno odabranih recepta ima manju težinu u odnosu na broj prethodno izvršenih recepata jer izvršeni recept predstavlja snažniji signal stvarne korisnikove navike. Trenutno, prethodni odabiri nose 20 bodova, dok prethodna izvršenja nose 35 bodova. Zbroj svih tih bodova kojim ocjenjujemo recepte je 100( 25+15+5+20+35). Uz to sve, dodao sam i funkciju koja logaritamski normalizira broj izvršenih i odabranih recepata. Ta funkcija omogućava da prvih nekoliko odabira relativno brzo poveća rezultat recepta, dok se utjecaj dodatnih odabira postupno smanjuje. Na taj se način sprječava da recept koji je vrlo često korišten potpuno dominira preporukama.
+Metoda score u klasi Heuristika izračunava konačni rezultat pojedinog recepta kao kombinaciju navednih signala. Pokrivenost ima težinu 25, prioriret roka trajanja 15, a vrijeme 5. Utjecaj vremena je namjerno smanjen u odnosu na druge kriterije. Dodana je i formula koja dodatno normalizira vrijeme kojom kraći recepti dobivaju veći broj bodova, dok se njihov utjecaj postupno smanjuje kako se vrijeme povećava. Najvažniji dio heuristike predstavljaju korisnikove navike. One se određuju na temelju broja prethodnih odabira i izvršenja pojedinog recepta. Broj prethodno odabranih recepta ima manju težinu u odnosu na broj prethodno izvršenih recepata jer izvršeni recept predstavlja snažniji signal stvarne korisnikove navike. Trenutno, prethodni odabiri nose 20 bodova, dok prethodna izvršenja nose 35 bodova. Zbroj svih tih bodova kojim se ocjenjuju recepti je 100( 25+15+5+20+35). 
 \\ 
-U dbqueries.dart imamo metodu koja priprema podatke potrebne za heuristički algoritam. Ona iz baze dohvaća sve informacije o kanadidatima(broj odabira, broj izvršenih recepata, vrijeme pripreme...). I ovdje se koristi argument jeDorucak kao i u strojnom učenju, kako bi razlikovali recepte koji su za doručak i oni koji su za ručak\/večeru. Na samom kraju, kao i kod strojnog učenja, u datoteci plan\_prehrane.dart metoda povezuje rezultate iz baze s heurističkim algoritmom. Rezultati heurističkog algoritma su identifikatori 3 najbolja rangirana recepta, koji se zatim prikazuju korisniku kao heurističke preporuke. Budući da se u istom prozoru prikazuju i preporuke dobivene strojnim učenjem, moguće je izravno usporediti rezultate dvaju pristupa u istoj situaciji i nad istim skupom recepata.
+U dbqueries.dart nalazi se metoda koja priprema podatke potrebne za heuristički algoritam. Ona iz baze dohvaća sve informacije o kanadidatima(broj odabira, broj izvršenih recepata, vrijeme pripreme...). I ovdje se koristi argument jeDorucak kao i u strojnom učenju, kako bi razlikovali recepte koji su za doručak i oni koji su za ručak\/večeru. Na samom kraju, kao i kod strojnog učenja, u datoteci plan\_prehrane.dart metoda povezuje rezultate iz baze s heurističkim algoritmom. Rezultati heurističkog algoritma su identifikatori 3 najbolja rangirana recepta, koji se zatim prikazuju korisniku kao heurističke preporuke. Budući da se u istom prozoru prikazuju i preporuke dobivene strojnim učenjem, moguće je izravno usporediti rezultate dvaju pristupa u istoj situaciji i nad istim skupom recepata.
+
+Na slici  je prikazan primjer rezultata heurističkog pristupa za istog korisnika kao i kod strojnog učenja. Na temelju dostupnosti namirnica, prioriteta roka trajanja, vremena pripreme te prethodnih odabira i izvršenja recepata, heuristički pristup rangira dostupne kandidate i prikazuje tri najbolje rangirana recepta. U prikazanom primjeru preporučeni su Burek sa sirom, Kruh i jogurt te Kruh i maslac.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textheight,keepaspectratio]{dodatci/top3heur.png}
+    \caption{Primjer prijedloga recepata heurističkim pristupom}
+    \label{slk:toptriheur}
+\end{figure}
 
 \subsubsection{Usporedba strojnog učenja i heuristike}
 
-Kako bi se omogućila usporedba preporuka dobivenih tim metodama, bilo je potrebno osigurati dovoljno podataka o prethodnom ponašanju korisnika. Za potrebe ispitivanja napravio sam 3 računa korisnika: Petar, Jakov i Stjepan. Svakom od njih namjerno je dodijeljena različita preferencija kod obroka. Petru sam dodijelio sklonost piletinu, Jakovu sklonost junetini i Stjepanu sklonost svinjetini.
+Kako bi se omogućila usporedba preporuka dobivenih tim metodama, bilo je potrebno osigurati dovoljno podataka o prethodnom ponašanju korisnika. Za potrebe ispitivanja napravljena su 3 računa korisnika: Petar, Jakov i Stjepan. Svakom od njih namjerno je dodijeljena različita preferencija kod obroka. Petru je dodijeljena sklonost piletinu, Jakovu sklonost junetini i Stjepanu sklonost svinjetini.
 
-U receptima je bilo dovoljno recepata za svaku od tih vrsta mesa, s tim da je bilo i dodatnih recepata koji nisu uključivali te sastojke. Bilo je dostupno ukupno 40ak recepata. Za svakog od tri korisnika generirana je povijest prehrane u trajanju od 30 dana, a za svaki dan su generirana 3 obroka: doručak, ručak i večera. To znači da sam generirao 270 zapisa za potrebe testiranja. Svakom od njih dodjeljivao sam veliki broj obroka s njihovim preferiranim mesom, kako bi vidio funkcionira li heuristika i strojno učenje. Otprilike 60\% jela koje   je pojedinac jeo je bilo jelo s preferiranim mesom. Bez obzira na preferirano meso, sva trojica su dobivala i mesne obroke onog drugog korisnika, tako da dobijem izmiješane obroke i da korisnik ne jede samo jednu vrstu mesa. 
+Za svakog korisnika generirana je povijest prehrane u trajanju od 30 dana s tri obroka dnevno, čime je dobiveno ukupno 270 zapisa. Približno 60 \% odgovarajućih obroka svakog korisnika sadržavalo je njegovu preferiranu vrstu mesa. Preostali obroci uključivali su i druge vrste recepata kako povijest korisnika ne bi sadržavala isključivo jednu kategoriju hrane. Na taj je način stvoren kontrolirani skup podataka u kojem je poznata dominantna preferencija svakog korisnika.
 
+Nakon stvaranja povijesti za svakog su korisnika generirane tri najbolje rangirane preporuke modelom strojnog učenja i heurističkim pristupom. Cilj ispitivanja bio je provjeriti reagiraju li oba pristupa na različitu povijest korisnika te u kojoj se mjeri njihove konačne preporuke međusobno podudaraju.
 Rezultati tog testiranja su bili ovakvi: 
 
 \begin{figure}[H]
@@ -719,14 +739,12 @@ Rezultati tog testiranja su bili ovakvi:
     \label{slk:usporedba_preporuka}
 \end{figure}
 
-Na primjeru prvog korisnika, Petra, vidimo da i ML i heuristika predlažu 2 ista recepta, dok se razlikuju u jednom receptu i poretku preporuka. To pokazuje da oba pristupa prepoznaju isti interes, ali pojedine signale koji utječu na konačno rangiranje vrednuju različito.
+Kod Petra su se podudarala dva od tri preporučena recepta, odnosno 66,7 \% preporuka, dok se njihov poredak razlikovao. Kod Jakova je zabilježeno potpuno podudaranje, odnosno sva tri recepta preporučena su istim redoslijedom. Kod Stjepana su se, kao i kod Petra, podudarala dva od tri recepta, uz razliku u njihovu poretku. Promatrajući sva tri korisnika zajedno, dva su pristupa preporučila ukupno sedam jednakih recepata od mogućih devet, što predstavlja podudaranje od 77,8 \% ako se promatra pripadnost recepta skupu tri najbolje preporuke.
 
-Kod drugog korisnika, vidimo da je podudaranje još izraženije. I strojno učenje i heuristika su preporučili 3 identična recepta i to istim redoslijedom. To pokazuje da se oba pristupa mogu potpuno složiti i preporučiti iste kandidate.
-
-Kod trećeg korisnika, Stjepana, opet vidimo isto kao i kod Petra, dva identična recepta i jedan različiti, u drugom poretku. 
+Provedeno ispitivanje temelji se na usporedbi pojedinačnih preporuka dobivenih na temelju prethodno generirane povijesti korisnika. Cilj je bio provjeriti koliko se preporuke dvaju pristupa podudaraju i koliko se prilagođavaju različitim korisničkim preferencijama. Ispitivanje nije obuhvaćalo izradu cijelih jelovnika za dulja razdoblja, pa se dobiveni rezultati odnose prvenstveno na usporedbu pojedinačnih preporuka.
 
 
-Na temelju provedene usporedbe vidljivo je da su oba pristupa uspješno proizvela personalizirane preporuke u skladu s prethodnim ponašanjem korisnika. Rezultati strojnog učenja i heuristike u velikoj su se mjeri podudarali: kod Petra i Stjepana podudarala su se dva od tri preporučena recepta, dok su kod Jakova sva 3 recepta bila jednaka i prikazana istim slijedom. To pokazuje da oba pristupa mogu prepoznati dominantne korisničke preferencije, iako do rezultata dolaze na različite načine.Glavna razlika između pristupa nalazi se u određivanju važnosti pojedinih kriterija. Kod heuristike težine su unaprijed ručno definirane, zbog čega je njezino ponašanje jednostavnije objasniti i prilagoditi. Kod strojnog učenja koeficijenti se određuju treniranjem na dostupnim podacima, što omogućuje prilagodbu modela ponovnim treniranjem nakon prikupljanja novih korisničkih podataka. Međutim, uspješnost takvog pristupa u većoj mjeri ovisi o količini i kvaliteti podataka za treniranje.Na temelju provedenog testiranja nije utvrđeno da preporuke generirane strojnim učenjem značajno poboljšavaju planiranje obroka u odnosu na heuristički pristup. Heuristika je na korištenim podacima dala vrlo slične rezultate uz jednostavniji i transparentniji način odlučivanja. Ipak, strojno učenje ima potencijalnu prednost kod većeg broja stvarnih korisničkih podataka, zbog čega bi se njegova prednost mogla jasnije pokazati nakon duljeg korištenja aplikacije i ponovnog treniranja modela.
+Na temelju provedene usporedbe vidljivo je da su oba pristupa proizvela personalizirane preporuke u skladu s prethodnim ponašanjem korisnika. Rezultati strojnog učenja i heurističkog pristupa u velikoj su se mjeri podudarali. Kod Petra i Stjepana podudarala su se dva od tri preporučena recepta, dok su kod Jakova sva tri recepta bila jednaka i prikazana istim slijedom. Promatrajući sva tri korisnika zajedno, sedam od ukupno devet recepata pojavilo se među tri najbolje preporuke oba pristupa, što predstavlja podudaranje od 77,8 \%. Razlike između pristupa bile su izraženije u poretku pojedinih recepata nego u samom izboru preporučenih recepata. Glavna razlika između pristupa nalazi se u načinu određivanja važnosti pojedinih kriterija. Kod heurističkog pristupa težine su unaprijed ručno definirane, zbog čega je njegovo ponašanje jednostavnije objasniti i prilagoditi. Kod strojnog učenja koeficijenti se određuju treniranjem na dostupnim podatcima. Zbog različitog načina određivanja važnosti pojedinih značajki dolazi i do razlika u konačnom poretku preporučenih recepata. Na korištenom skupu podataka nije uočena velika razlika između konačnih preporuka dvaju pristupa. Heuristički pristup dao je vrlo slične rezultate uz jednostavniji i transparentniji način odlučivanja. S druge strane, model strojnog učenja može se ponovno trenirati nakon prikupljanja novih korisničkih podataka, pri čemu njegova uspješnost ovisi o količini i kvaliteti dostupnih podataka za treniranje. Zbog toga bi se razlike između dvaju pristupa mogle jasnije pokazati nakon prikupljanja veće količine stvarnih korisničkih podataka. Provedeno ispitivanje temelji se na usporedbi pojedinačnih preporuka dobivenih na temelju prethodno generirane povijesti korisnika. Cilj je bio provjeriti koliko se preporuke dvaju pristupa podudaraju i koliko se prilagođavaju različitim korisničkim preferencijama. Ispitivanje nije obuhvaćalo izradu cijelih jelovnika za dulja razdoblja, pa se dobiveni rezultati odnose prvenstveno na usporedbu pojedinačnih preporuka.
 
 
 
@@ -760,12 +778,19 @@ Popis svih datoteka jediničnih testova
     \item zalihe\_test.dart -> vezano uz zaliheKorisnika.dart, testira prikaz zaliha i upozorenja(istek roka ili minimalna količina), dodavanje zalihe, uređivanje i brisanje zalihe
 \end{enumerate}
 
-Pokrivenost koda mjeri koliki je udio izršivih linija koda aktiviran tijekom pokretanja testova. U ovom radu pokrivenost se mjeri nad izvornim datotekama u mapi lib, pri čemu se postotak računa na testabilnim linijama koda. Za svaku datoteku zasebno prikazani su broj pokrivenih i ukupnih testabilnih linija te pripadni postotak, što omogućuje precizno uočavanje slabije pokrivenih dijelova sustava. Pokrivenost koda jediničnim testovima u ovom projektu je otprilike 80\% a pokrivenost po datotekama vidljivo na donjoj slici. 
+Pokrivenost koda mjeri koliki je udio izršivih linija koda aktiviran tijekom pokretanja testova. U ovom radu pokrivenost se mjeri nad izvornim datotekama u mapi lib, pri čemu se postotak računa na testabilnim linijama koda. Za svaku datoteku zasebno prikazani su broj pokrivenih i ukupnih testabilnih linija te pripadni postotak, što omogućuje precizno uočavanje slabije pokrivenih dijelova sustava. Pokrivenost koda jediničnim testovima u ovom projektu je 87.16\% a pokrivenost po datotekama vidljivo na donjoj drugoj slici. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textheight,keepaspectratio]{dodatci/pokrivenost_koda_mini.png}
+    \caption{Pokrivenost koda jediničnim testovima}
+    \label{slk:pokrivenostmini}
+\end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\textheight,keepaspectratio]{dodatci/pokrivenost_koda.png}
-    \caption{Pokrivenost koda jediničnim testovima}
+    \caption{Pokrivenost koda jediničnim testovima po datotekama}
     \label{slk:pokrivenost}
 \end{figure}
 
@@ -792,13 +817,13 @@ Integration\_test mapa sadrži end-to-end testove koji pokreću stvarnu aplikaci
     Ovaj test testira dodavanje recepata sa sastojcima i naknadno brisanje recepata. Prvo s home stranice navigiramo na stranicu s receptima, te zatim odmah po dolasku na stranicu gleda postoji li već recept kojeg želi napraviti. Ako postoji i ako je autor isti, briše ga. Ako ga nema, otvara formu za unos recepta, te unosi naziv, vrijeme pripreme i opis. Zatim dodaje sastojak iz dropdown liste, te ima mogućnost listanja liste zbog njene dužine. Za svaki sastojak unosi količinu, te zatim odabire "Dodavanje recepta". Nakon spremanja, provjerava da je recept vidljiv na zaslonu, te kasnije briše recept kako bi doveo sustav u stanje u kojem ga je pronašao.
     \item registracija\_test.dart
     \\
-    U ovom testu fokus je na registraciji i validaciji duplikata maila. U testu se prvo osigurava da se kreće iz odjavljenog stanja. Imamo 2 glavna scenarija. U prvom scenariju se generira jedinstveni email pomoću funkcije vremena kako bi se izbjegle kolizije, te se popunjavaju polja(ime, prezime, email, lozinka, te potvrda). Zatim se verificira redirect na home ekran nakon uspješne registracije. Ulazi se u profil, provjerava da je novonastali račun s tim emailom prikazan. Zatim se čiste testni podatci brisanjem računa i provjerava povratak na auth ekran. U drugom scenariju korisnik se pokušava registrirati koristeći hardcodirani, već korišteni mail, te se očekuje poruka da je taj email već registriran.
+    U ovom testu fokus je na registraciji i validaciji duplikata maila. U testu se prvo osigurava da se kreće iz odjavljenog stanja. Test obuhvaća 2 glavna scenarija. U prvom scenariju se generira jedinstveni email pomoću funkcije vremena kako bi se izbjegle kolizije, te se popunjavaju polja(ime, prezime, email, lozinka, te potvrda). Zatim se verificira redirect na home ekran nakon uspješne registracije. Ulazi se u profil, provjerava da je novonastali račun s tim emailom prikazan. Zatim se čiste testni podatci brisanjem računa i provjerava povratak na auth ekran. U drugom scenariju korisnik se pokušava registrirati koristeći hardcodirani, već korišteni mail, te se očekuje poruka da je taj email već registriran.
     \item trgovina\_flow\_test.dart
     \\
-    Ovo je ujedno najveći test u funkcionalnim testovima. Pokriva tokove popisa za trgovinu uključujući i uređivanje i stanje "kupljeno". Prvo dolazimo na ekran za upravljenje popisom za trgovinu, te pokuša pronaći stavku koju želi dodati u testu te ju briše ako postoji. U prvom testu, dodaje određenu stavku. Prvo u formi za dodavanje iz dropdown liste odabire kategoriju, zatim sastojak i na kraju potrebnu količinu. Tu testira i verifikaciju da ne možemo dodati količinu "0". Zatim ide na uređivanje iste te stavke, ulazi kroz gumb za uređivanje, mijenja količinu i zatim potvrđuje sa "Spremi". Nakon toga obavlja "kupnju". Označuje stavku kao "kupljenu" , potvrđuje kupnju u dijalogu te se nakon toga očekuje da je stavka obrisana. Drugi test je dodavanje stavke istim tokom kao u prethodnom testu te se odmah testira brisanje stavke te potvrda odluke.
+    Ovo je ujedno najveći test u funkcionalnim testovima. Pokriva tokove popisa za trgovinu uključujući i uređivanje i stanje "kupljeno". Prvo dolazimo na ekran za upravljenje popisom za trgovinu, te pokuša pronaći stavku koju želi dodati u testu te ju briše ako postoji. U prvom testu, dodaje određenu stavku. Prvo u formi za dodavanje iz dropdown liste odabire kategoriju, zatim sastojak i na kraju potrebnu količinu. Tu testira i verifikaciju da se ne može dodati količinu "0". Zatim ide na uređivanje iste te stavke, ulazi kroz gumb za uređivanje, mijenja količinu i zatim potvrđuje sa "Spremi". Nakon toga obavlja "kupnju". Označuje stavku kao "kupljenu" , potvrđuje kupnju u dijalogu te se nakon toga očekuje da je stavka obrisana. Drugi test je dodavanje stavke istim tokom kao u prethodnom testu te se odmah testira brisanje stavke te potvrda odluke.
     \item zalihe\_crud\_test.dart
     \\
-    Ovaj test pokriva CRUD tok za korisničke zalihe namirnica(dodavanje, uređivanje, brisanje). Prvo kroz navigacijsku traku odlazimo na zaslon zaliha korisnika. Ako korisnik nekim slučajem nije ulogiran, prvo se odradi logiranje korisnika. Odmah nakon toga, funkcija briše ciljnu namirnicu ako već postoji. Zatim slijedi scenarij dodavanja. Otvara se dijalog za dodavanje namirnice. Zatim se bira kategorija, a zatim i sam sastojak kroz dva dropdowna. Unosi se količina i minimalna količina koju korisnik želi imati, te se odabire datum roka trajanja i zatim spremanje. Nakon spremanja provjerava da je namirnica prikazana s očekivanom količinom. Nakon toga testira uređivanje, odabire gumb za to, te u formi za uređivanje mijenja količinu, spremi i nakon toga provjeri novu vrijednost. Na samom kraju obriše tu namirnicu i potvrdi da je nestala s liste. U ovom testu je važno odabrati sastojak koji postoji pod tom kategorijom i pod tim nazivom u bazi podataka.
+    Ovaj test pokriva CRUD tok za korisničke zalihe namirnica(dodavanje, uređivanje, brisanje).Test najprije putem navigacijske trake otvara zaslon zaliha korisnika. Ako korisnik nekim slučajem nije ulogiran, prvo se odradi logiranje korisnika. Odmah nakon toga, funkcija briše ciljnu namirnicu ako već postoji. Zatim slijedi scenarij dodavanja. Otvara se dijalog za dodavanje namirnice. Zatim se bira kategorija, a zatim i sam sastojak kroz dva dropdowna. Unosi se količina i minimalna količina koju korisnik želi imati, te se odabire datum roka trajanja i zatim spremanje. Nakon spremanja provjerava da je namirnica prikazana s očekivanom količinom. Nakon toga testira uređivanje, odabire gumb za to, te u formi za uređivanje mijenja količinu, spremi i nakon toga provjeri novu vrijednost. Na samom kraju obriše tu namirnicu i potvrdi da je nestala s liste. U ovom testu je važno odabrati sastojak koji postoji pod tom kategorijom i pod tim nazivom u bazi podataka.
 \end{enumerate}
 
 
@@ -828,7 +853,7 @@ GitHub je web platforma za verzioniranje i upravljanje kodom koja omogućuje pro
 
 %--- ZAKLJUČAK / CONCLUSION ----------------------------------------------------
 \chapter{Zaključak}
-U današnje vrijeme, kad je sve užurbano i stresno, praćenje naših obroka i namirnica može biti vrlo komplicirano zbog nedostatka vremena. Iz tog problema rodila se ideja o aplikaciji koja će olakšati praćenje zaliha namirnica u našem domu i pomoću koje će planiranje obroka postati puno lakše. Ova Android aplikacija pruža korisnicima praktičan alat za organizaciju i optimizaciju svakodnevnog života. Aplikacija omogućava praćenje zaliha namirnica, planiranje tjednih obroka i stvaranje popisa za kupovinu. Još jedan plus ove aplikacije je što kontinuirano praćenje zaliha hrane može doprinijet smanjenju nepotrebnog bacanja hrane nakon isteka roka. Ovaj projekt je uspješno realiziran prema postavljenim ciljevima i rokovima uz primjenu modernih i aktualnih tehnologija koje su jedne od boljih za razvoj mobilnih aplikacija. Budući razvoj može uključivati dodatne funkcionalnosti te samim time postati puno bolja aplikacija, jer prostora za napredak ima. Ova aplikacija je još jedan primjer kako nam tehnologija danas pomaže i kako može biti korisno sredstvo u rješavanju svakodnevnih izazova.
+U okviru ovog rada razvijena je Android aplikacija za upravljanje zalihama namirnica i planiranje obroka. Implementirane su glavne funkcionalnosti potrebne za svakodnevno korištenje aplikacije, među kojima su praćenje zaliha namirnica, planiranje obroka, upravljanje receptima i izrada popisa za kupovinu. Poseban naglasak stavljen je na sustav preporuke recepata, za koji su implementirana dva različita pristupa: model strojnog učenja i heuristički pristup. Model strojnog učenja temelji se na logističkoj regresiji, a preporuke prilagođava korisniku na temelju podataka poput prethodnih odabira i izvršenja recepata, dostupnosti namirnica, prioriteta roka trajanja i vremena pripreme. Heuristički pristup koristi iste informacije, ali konačni rezultat određuje pomoću unaprijed definiranih pravila i težina. Na taj su način implementirana dva različita načina rangiranja recepata koja omogućuju stvaranje personaliziranih preporuka na temelju prethodnog ponašanja korisnika. Za provjeru rada oba pristupa provedeno je testiranje na tri korisnika s različitim preferencijama. Za svakog korisnika generirana je povijest prehrane u trajanju od 30 dana, čime je ukupno dobiveno 270 zapisa. Rezultati su pokazali da oba pristupa uspješno prepoznaju dominantne korisničke preferencije te da na temelju svih paremetara daju slične rezultate. Dobiveni rezultati pokazuju da na korištenim podacima strojno učenje nije ostvarilo značajno poboljšanje preporuka u odnosu na heuristički pristup. Heuristički pristup dao je vrlo slične rezultate, uz jednostavniji i transparentniji način određivanja važnosti pojedinih kriterija. S druge strane, prednost strojnog učenja nalazi se u mogućnosti automatskog određivanja koeficijenata na temelju podataka i ponovnog treniranja modela nakon prikupljanja novih podataka. Zbog toga bi se razlika između pristupa mogla jasnije pokazati nakon duljeg korištenja aplikacije i prikupljanja veće količine stvarnih korisničkih podataka. Razvijena aplikacija ispunjava postavljene ciljeve rada te pokazuje mogućnost primjene različitih pristupa preporučivanju recepata u sustavu za planiranje prehrane.
 \label{pog:zakljucak}
 
 
@@ -865,7 +890,7 @@ U današnje vrijeme, kad je sve užurbano i stresno, praćenje naših obroka i n
 \backmatter
 
 \chapter{Kod}
-Kod je dodan u posebnom privitku. Dijelovi koda su objašnjeni u određenim poglavljima ovog diplomskog rada.
+Programski kod aplikacije priložen je u posebnom privitku, dok su u radu opisane funkcionalnosti i uloge pojedinih dijelova implementacije.
 
 
 \end{document}

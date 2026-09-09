@@ -28,6 +28,4 @@ flutter test --coverage
 python coverage/coverage_report.py
 ```
 
-Ako je ukupna pokrivenost ispod definiranog minimuma, `coverage_report.py` vraca exit code 1.
-Trenutni cilj: najmanje 60%.
 
